@@ -1,0 +1,4 @@
+<h3 id="quiz-description">{{= it.desc}}<h3>
+<div id="quiz-challenge">
+  {{= it.challenge}}
+</div>

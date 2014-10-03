@@ -1,0 +1,15 @@
+var fs = require('fs');
+var stylus = require('stylus');
+var mainFile = 'main.styl';
+var mainFilePath = __dirname + '/../../client/style/' + mainFile;
+var mainContent = fs.readFileSync(mainFilePath, 'utf8');
+
+module.exports.compile = function (callback) {
+  stylus(mainContent)
+    .set('filename', mainFilePath)
+    .set('paths', [__dirname + '/../../client/style'])
+    .render(function (err, css) {
+      if (err) throw err;
+      callback(css);
+    });
+};
