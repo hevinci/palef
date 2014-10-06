@@ -4,6 +4,12 @@ var mainFile = 'main.styl';
 var mainFilePath = __dirname + '/../../client/style/' + mainFile;
 var mainContent = fs.readFileSync(mainFilePath, 'utf8');
 
+/**
+ * Compiles stylus files into css and executes the given callback
+ * with the resulting string.
+ *
+ * @param callback
+ */
 module.exports.compile = function (callback) {
   stylus(mainContent)
     .set('filename', mainFilePath)

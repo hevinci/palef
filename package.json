@@ -7,7 +7,8 @@
     "stylus": "^0.49.1"
   },
   "scripts": {
-    "build": "node server/build/builder.js"
+    "build": "node server/build/builder.js",
+    "build-test": "node server/build/test.js"
   },
   "devDependencies": {
     "mocha": "^1.21.4",

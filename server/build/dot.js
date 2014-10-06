@@ -4,6 +4,12 @@ var glob = require('glob');
 var indexTemplate = __dirname + '/../template/index.dot';
 var templateDir = __dirname + '/../../client/template';
 
+/**
+ * Compiles doT templates and executes the given callback with
+ * an object containing:
+ *   1) the main index template (function)
+ *   2) the template fragments (serialized object)
+ */
 module.exports.compile = function (callback) {
   glob('**/*.dot', { cwd: templateDir }, function (err, files) {
     if (err) throw err;
