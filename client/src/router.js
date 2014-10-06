@@ -9,12 +9,11 @@ Router.prototype.add = function (regex, handler) {
 };
 
 Router.prototype.start = function () {
-  window.onhashchange = this.execute.bind(this);
-  document.body.onload = this.execute.bind(this);
+  window.onhashchange = this._handleHashChange.bind(this);
+  document.body.onload = this._handleHashChange.bind(this);
 };
 
 Router.prototype.execute = function (hash) {
-  var hash = hash || location.hash;
   var match = null;
 
   for (var i = 0, max = this.regexes.length; i < max; ++i) {
@@ -29,6 +28,10 @@ Router.prototype.execute = function (hash) {
   }
 
   return false;
+};
+
+Router.prototype._handleHashChange = function () {
+  this.execute(location.hash);
 };
 
 module.exports = Router;
