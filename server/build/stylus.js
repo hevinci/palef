@@ -1,7 +1,6 @@
 var fs = require('fs');
 var stylus = require('stylus');
-var mainFile = 'main.styl';
-var mainFilePath = __dirname + '/../../client/style/' + mainFile;
+var mainFilePath = __dirname + '/../../client/style/index.styl';
 var mainContent = fs.readFileSync(mainFilePath, 'utf8');
 
 /**
