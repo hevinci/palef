@@ -2,6 +2,7 @@
 node_modules
 npm-debug.log
 public/index.html
+public/manifest.appcache
 public/test/bundle.js
 public/test/templates.js
 public/test/vendor

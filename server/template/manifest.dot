@@ -1,2 +1,5 @@
 CACHE MANIFEST
+
+# {{= it.version }}
+
 font/sourcesanspro-light.woff
