@@ -1,3 +1,4 @@
+var db = require('./../database');
 var ChoiceHandler = require('./../quiz/handler/choice');
 
 function ModulePlayer(element, modules) {
@@ -34,20 +35,31 @@ ModulePlayer.prototype.showStep = function (moduleId, stepId) {
   if (step.type === 'text') {
     contentEl.innerHTML = step.data;
     container.appendChild(fragment);
-    console.log('should display text:', step.data);
+    saveTrace(moduleId, stepId, 'text', true);
   } else if (step.type === 'quiz') {
     var player = new ChoiceHandler(contentEl, {
       rendered: function () {
         container.appendChild(fragment)
       },
-      succeeded: function () {console.log('succ')},
-      failed: function () {console.log('fail')}
+      succeeded: function () {
+        saveTrace(moduleId, stepId, 'quiz', true);
+      },
+      failed: function () {
+        saveTrace(moduleId, stepId, 'quiz', false);
+      }
     });
     player.startChallenge(step.data.challenge);
-    console.log('should display quiz');
   } else {
     throw new Error('Unknown step type: ' + step.type);
   }
 };
+
+function saveTrace(moduleId, stepId, type, completed) {
+  db.open().then(function () {
+    db.addTrace(moduleId, stepId, type, completed);
+  }).catch(function (err) {
+    console.error(err);
+  });
+}
 
 module.exports = ModulePlayer;

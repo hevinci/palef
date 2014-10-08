@@ -1,3 +1,6 @@
+// add global promise polyfill in browsers
+require('es6-promise').polyfill();
+
 var Router = require('./router');
 var ModulePlayer = require('./module/player');
 var router = new Router();
@@ -22,6 +25,9 @@ router.add(/^#modules\/(\d+)\/*$/, function (id) {
 });
 router.add(/^#modules\/(\d+)\/steps\/(\d+)*$/, function (moduleId, stepId) {
   modulePlayer.showStep(parseInt(moduleId), parseInt(stepId));
+});
+router.add(/.*/, function () {
+  modulePlayer.list();
 });
 
 router.start();
