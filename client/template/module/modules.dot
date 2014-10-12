@@ -1,7 +1,0 @@
-<ul>
-  {{~ it :module:i }}
-    <li>
-      <a href="#modules/{{= module.id }}">{{= module.title }}</a>
-    </li>
-  {{~ }}
-<ul>

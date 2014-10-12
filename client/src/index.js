@@ -1,8 +1,10 @@
 // add global promise polyfill in browsers
 require('es6-promise').polyfill();
+require('document-register-element');
+require('./component/app_palef');
 
+var app = document.createElement('app-palef');
 var Router = require('./router');
-var ModulePlayer = require('./module/player');
 var router = new Router();
 
 var modules = [
@@ -12,22 +14,20 @@ var modules = [
   require('./../../fixtures/module/module4')
 ];
 
-var modulePlayer = new ModulePlayer(
-  document.getElementById('container'),
-  modules
-);
+app.setModules(modules);
+document.body.appendChild(app);
 
 router.add(/^#modules\/*$/, function () {
-  modulePlayer.list();
+  app.listModules();
 });
 router.add(/^#modules\/(\d+)\/*$/, function (id) {
-  modulePlayer.showStep(parseInt(id), 1);
+  app.displayStep(parseInt(id), 1);
 });
 router.add(/^#modules\/(\d+)\/steps\/(\d+)*$/, function (moduleId, stepId) {
-  modulePlayer.showStep(parseInt(moduleId), parseInt(stepId));
+  app.displayStep(parseInt(moduleId), parseInt(stepId));
 });
 router.add(/.*/, function () {
-  modulePlayer.list();
+  app.listModules();
 });
 
 router.start();

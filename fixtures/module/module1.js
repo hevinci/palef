@@ -11,32 +11,42 @@ module.exports = {
       data: 'This is some text for step 2...'
     },
     {
-      type: 'quiz',
+      type: 'quiz-choice',
       data: {
-        type: "choice-unique",
         challenge: {
-          title: "Which answer contains foo ?",
-          choices: [
-            "This is foo and bar and baz. Lorem ipsum dolor etc.",
-            "Another choice: sunc item varibus dona equam.",
-            "For the last one, a bit of lorem ipsum but not that much."
-          ],
-          "solution": 0
-        }
+          uid: 1,
+          type: 'multiple',
+          title: "Which answer(s) contain(s) foo ?",
+          items: [
+            { uid: 1, text: "This is foo and bar and baz. Lorem ipsum dolor foo etc."},
+            { uid: 2, text: "Sunc item varibus dona equam."},
+            { uid: 3, text: "Velleam nictur sorit nunc est foo bellis."}
+          ]
+        },
+        solutions: [
+          { uid: 1, score: 3 },
+          { uid: 2, score: 0 },
+          { uid: 3, score: 2 }
+        ]
       }
     },
     {
-      type: 'quiz',
+      type: 'quiz-choice',
       data: {
-        type: "choice-unique",
+        type: "choice",
         challenge: {
+          uid: 2,
+          type: 'single',
           title: "1 + 1 = 2 ?",
-          choices: [
-            "True",
-            "False"
-          ],
-          "solution": 0
-        }
+          items: [
+            { uid: 1, text: "True" },
+            { uid: 2, text: "False" }
+          ]
+        },
+        solutions: [
+          { uid: 1, score: 2 },
+          { uid: 2, score: 0 }
+        ]
       }
     }
   ]
