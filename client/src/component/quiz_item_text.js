@@ -23,20 +23,22 @@ itemPrototype._build = function () {
   this.label = document.createElement('label');
   this.text = document.createTextNode('');
   this.input.onclick = this._onSelected.bind(this);
+  var span = document.createElement('span');
+  span.appendChild(this.text);
   this.label.appendChild(this.input);
-  this.label.appendChild(this.text);
+  this.label.appendChild(span);
   this.appendChild(this.label);
 };
 
 itemPrototype._bind = function (data) {
   this.input.id = this.quizUid + '-' + this.uid;
   this.input.type = this.type === 'single' ? 'radio' : 'checkbox';
-  this.input.name = data.name;
+  this.input.name = 'quiz-' + this.quizUid;
   this.text.data = data.text;
   this.label.htmlFor = this.input.id;
 };
 
-itemPrototype._onSelected = function () {
+itemPrototype._onSelected = function (event) {
   var isSelected = true;
 
   if (this.type !== 'single' && !event.target.checked) {
@@ -48,4 +50,4 @@ itemPrototype._onSelected = function () {
   }
 };
 
-document.registerElement('quiz-text-item', { prototype: itemPrototype });
+document.registerElement('quiz-item-text', { prototype: itemPrototype });

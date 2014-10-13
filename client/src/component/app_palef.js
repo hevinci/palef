@@ -1,5 +1,7 @@
+require('./nav_bar');
 require('./module_list');
-require('./module_nav');
+require('./module_status');
+require('./module_controls');
 require('./quiz_choice');
 
 var db = require('./../database');
@@ -9,10 +11,12 @@ var appPrototype = Object.create(HTMLElement.prototype);
 appPrototype.createdCallback = function () {
   this.modules = [];
   this.navBar = null;
-  this.moduleNav = null;
+  this.moduleStatus = null;
+  this.moduleControls = null;
   this.container = null;
   this.moduleList = null;
   this.currentElement = null;
+  this.defaultTitle = null;
   this._build();
 };
 
@@ -21,39 +25,41 @@ appPrototype.setModules = function (modules) {
 };
 
 appPrototype.listModules = function () {
-  this.moduleNav.hide();
+  this.moduleControls.hide();
   this.moduleList.setModules(this.modules);
+  this.navBar.displayCenter(this.defaultTitle);
   this._switchTo(this.moduleList);
 };
 
 appPrototype.displayStep = function (moduleId, stepId) {
+  var stepData = this.modules[moduleId - 1].steps[stepId - 1];
   var stepCount = this.modules[moduleId - 1].steps.length;
 
-  this.moduleNav.showStepProgress({
-    moduleId: moduleId,
+  this.moduleStatus.showStatus({
     moduleTitle: this.modules[moduleId - 1].title,
     currentStep: stepId,
-    stepCount: this.modules[moduleId - 1].steps.length,
+    stepCount: this.modules[moduleId - 1].steps.length
+
+  });
+  this.moduleControls.showControls({
+    moduleId: moduleId,
     previousStep: stepId > 1 ? stepId - 1 : false,
     nextStep: stepCount > stepId ? stepId + 1 : false
   });
 
-  var stepData = this.modules[moduleId - 1].steps[stepId - 1];
+  this.navBar.displayCenter(this.moduleStatus);
+  this.navBar.displayRight(this.moduleControls);
   this._switchTo(this._resolveStep(stepData, moduleId, stepId));
 };
 
 appPrototype._build = function () {
-  this.navBar = document.createElement('nav');
-  this.moduleNav = document.createElement('module-nav');
+  this.navBar = document.createElement('nav-bar');
+  this.moduleStatus = document.createElement('module-status');
+  this.moduleControls = document.createElement('module-controls');
   this.container = document.createElement('main');
   this.moduleList = document.createElement('module-list');
+  this.defaultTitle = document.createTextNode('Palef');
 
-  var homeAnchor = document.createElement('a');
-  homeAnchor.href = '#';
-  homeAnchor.appendChild(document.createTextNode('Home'));
-
-  this.navBar.appendChild(homeAnchor);
-  this.navBar.appendChild(this.moduleNav);
   this.appendChild(this.navBar);
   this.appendChild(this.container);
 };

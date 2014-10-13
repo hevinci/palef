@@ -1,4 +1,4 @@
-require('./item_text');
+require('./quiz_item_text');
 
 var quizPrototype = Object.create(HTMLElement.prototype);
 
@@ -56,7 +56,7 @@ quizPrototype._bind = function (title, items) {
   this.titleBox.innerHTML = title;
   var fragment = document.createDocumentFragment();
   items.forEach(function (data) {
-    var item = document.createElement('quiz-text-item');
+    var item = document.createElement('quiz-item-text');
     item.setData({
       uid: data.uid,
       quizUid: this.uid,
