@@ -14,7 +14,7 @@ itemPrototype.selectedCallback = null;
 itemPrototype.setData = function (data) {
   this.uid = data.uid;
   this.quizUid = data.quizUid;
-  this.type = data.type;
+  this.type = data.type || this.type;
   this._bind(data);
 };
 
