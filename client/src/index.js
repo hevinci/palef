@@ -31,3 +31,9 @@ router.add(/.*/, function () {
 });
 
 router.start();
+
+// TMP
+var HttpClient = require('./http_client');
+var client = new HttpClient();
+client.initListeners();
+//client.postAsJson('http://localhost/test.php', {});
