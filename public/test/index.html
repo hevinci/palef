@@ -1,29 +1,20 @@
+<!doctype html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Tests</title>
-    <link rel="stylesheet" href="vendor/mocha.css" />
+  <meta charset="utf-8">
+  <title>Tests</title>
+  <link rel="stylesheet" href="vendor/mocha.css" />
 </head>
 <body>
-<div id="mocha"></div>
-<script src="vendor/mocha.js"></script>
-<script>mocha.setup('bdd')</script>
-<script type="text/javascript">
-  /* Copied from doT.js (allows template rendering without doT.js inclusion) */
-  function encodeHTMLSource() {
-    var encodeHTMLRules = { '&': '&#38;', '<': '&#60;', '>': '&#62;', '"': '&#34;', "'": '&#39;', '/': '&#47;' },
-        matchHTML = /&(?!#?\w+;)|<|>|\"|'|\//g;
-    return function() {
-      return this ? this.replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : this;
-    };
-  };
-  String.prototype.encodeHTML = encodeHTMLSource();
-</script>
-<script src="templates.js"></script>
-<script src="bundle.js"></script>
-<script>
+  <div id="mocha"></div>
+  <div id="test-container" style="display: none"></div>
+  <script src="vendor/mocha.js"></script>
+  <script>mocha.setup('bdd')</script>
+  <script src="templates.js"></script>
+  <script src="bundle.js"></script>
+  <script>
     mocha.checkLeaks();
     mocha.run();
-</script>
+  </script>
 </body>
 </html>

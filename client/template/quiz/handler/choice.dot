@@ -1,9 +1,0 @@
-<h4>{{= it.title }}</h4>
-<div class="choices">
-  {{~ it.choices :val:i }}
-    <div class="choice">
-        <input type="radio" value="{{= i }}" name="quiz-choice">
-        <div>{{= val }}</div>
-    </div>
-  {{~ }}
-<button disabled>Valider</button>
