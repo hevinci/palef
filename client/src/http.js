@@ -3,7 +3,7 @@ require('es6-promise').polyfill();
 var http = module.exports = {};
 var isNavigatorOnline = navigator.onLine;
 
-window.addEventListener('online', function () {
+document.body.addEventListener('online', function () {
   isNavigatorOnline = true;
 
   if (http.onlineCallback) {
@@ -11,7 +11,7 @@ window.addEventListener('online', function () {
   }
 });
 
-window.addEventListener('offline', function () {
+document.body.addEventListener('offline', function () {
   isNavigatorOnline = false;
 });
 

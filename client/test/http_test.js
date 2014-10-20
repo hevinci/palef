@@ -1,4 +1,5 @@
 var assert = require('assert');
+var helpers = require('./../src/test_helpers');
 var http = require('./../src/http');
 
 describe('http', function () {
@@ -7,7 +8,7 @@ describe('http', function () {
     it('is called when the browser propagates an online event', function () {
       var callback = sinon.spy();
       http.onlineCallback = callback;
-      window.dispatchEvent(new Event('online'));
+      document.body.dispatchEvent(helpers.createEvent('online'));
       assert.ok(callback.calledOnce);
     })
   });
@@ -68,7 +69,7 @@ describe('http', function () {
     });
 
     it('returns an error if navigator is offline', function (done) {
-      window.dispatchEvent(new Event('offline'));
+      document.body.dispatchEvent(helpers.createEvent('offline'));
       http.sendTraces(['bar', 123])
         .catch(function (error) {
           assert.equal(http.OFFLINE, error.name);

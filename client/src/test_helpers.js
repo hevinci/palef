@@ -51,6 +51,13 @@ function click(selector) {
   });
 }
 
+function createEvent(name) {
+  var event = document.createEvent('Event');
+  event.initEvent(name, true, true);
+
+  return event;
+}
+
 function assertElement(element, shouldBeFilled) {
   assert.ok(element instanceof HTMLElement);
 
@@ -67,6 +74,7 @@ module.exports = {
   setDefaultElement: setDefaultElement,
   appendElement: appendElement,
   clean: clean,
+  createEvent: createEvent,
   select: select,
   assertElement: assertElement
 };
