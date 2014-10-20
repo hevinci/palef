@@ -1,52 +1,22 @@
 var assert = require('assert');
-var Database = require('./../src/database').Database;
+var db = require('./../src/database');
 
 describe('database', function () {
-  var db;
-  var stores = [
-    {
-      name: 'bar',
-      keyPath: 'id',
-      autoIncrement: true,
-      indexes: [
-        { field: 'field1', unique: false },
-        { field: 'field2', unique: true }
-      ]
-    },
-    {
-      name: 'baz',
-      keyPath: 'id',
-      autoIncrement: true,
-      indexes: [
-        { field: 'field1', unique: false },
-        { field: 'field2', unique: true }
-      ]
-    }
-  ];
 
-  afterEach(function () {
-    db.destroy();
+  afterEach(function (done) {
+    db.destroy('palef-test')
+      .then(done, done);
   });
 
   describe('#open', function () {
-    it('creates an empty database by default', function (done) {
-      db = new Database();
-      db.open()
+    it('creates the database if needed', function (done) {
+      db.open('palef-test')
         .then(function (_db) {
           assert.ok(_db instanceof IDBDatabase);
-          assert.equal('default', _db.name);
-          assert.equal(0, _db.objectStoreNames.length);
-        })
-        .then(done, done);
-    });
-    it('creates stores if provided', function (done) {
-      db = new Database('test1', stores);
-      db.open()
-        .then(function (_db) {
-          assert.ok(_db instanceof IDBDatabase);
-          assert.equal('test1', _db.name);
+          assert.equal('palef-test', _db.name);
+          assert.equal(2, _db.objectStoreNames.length);
           assert.deepEqual(
-            ['bar', 'baz'],
+            ['progress', 'traces'],
             [].slice.call(_db.objectStoreNames)
           );
         })
@@ -54,12 +24,62 @@ describe('database', function () {
     });
   });
 
-  describe('#add', function () {
-    it('creates objects in a given store', function (done) {
-      db = new Database('test2', stores);
-      db.open()
+  describe('#getTraces', function () {
+    it('retrieves existing traces', function (done) {
+      db.open('palef-test')
+        .then(db.getTraces)
+        .then(function (traces) {
+          assert.deepEqual({}, traces);
+        })
+        .then(done, done);
+    })
+  });
+
+  describe('#addTrace', function () {
+    it('adds a trace in the traces store', function (done) {
+      db.open('palef-test')
         .then(function () {
-          return db.add('bar', { field1: 'value1', field2: 'value2' });
+          return db.addTrace(1, 2, 'quiz', true);
+        })
+        .then(db.getTraces)
+        .then(function (traces) {
+          var keys = Object.keys(traces);
+          assert.equal(1, keys.length);
+          assert.equal(1, traces[1].module);
+          assert.equal(2, traces[1].step);
+          assert.equal('quiz', traces[1].type);
+          assert.equal(true, traces[1].complete);
+          assert.equal('number', typeof traces[1].time);
+        })
+        .then(done, done);
+    });
+  });
+
+  describe('#removeTraces', function () {
+    it('removes traces with the given ids', function (done) {
+      db.open('palef-test')
+        .then(function () {
+          return db.addTrace(1, 1, 'text', true);
+        })
+        .then(function () {
+          return db.addTrace(1, 2, 'quiz', true);
+        })
+        .then(function () {
+          return db.addTrace(1, 3, 'quiz', true);
+        })
+        .then(db.getTraces)
+        .then(function (traces) {
+          assert.equal(3, Object.keys(traces).length);
+        })
+        .then(function () {
+          // remove the two first traces
+          return db.removeTraces([1, 2]);
+        })
+        .then(db.getTraces)
+        .then(function (traces) {
+          // third trace (id 3) still exists
+          assert.equal(1, Object.keys(traces).length);
+          assert.ok(traces[3]);
         })
         .then(done, done);
     });
