@@ -1,5 +1,4 @@
 var assert = require('assert');
-var sinon = require('sinon');
 var Dispatcher = require('./../src/dispatcher').Dispatcher;
 
 describe('dispatcher', function () {

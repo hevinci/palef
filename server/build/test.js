@@ -2,7 +2,7 @@ var fs = require('fs');
 var glob = require('glob');
 var browserify = require('browserify')();
 var dotBuilder = require('./dot');
-var mochaDir = __dirname + '/../../node_modules/mocha';
+var moduleDir = __dirname + '/../../node_modules';
 var testDir = __dirname + '/../../client/test';
 var tgtDir = __dirname + '/../../public/test';
 var vendorDir = tgtDir + '/vendor';
@@ -10,11 +10,15 @@ var vendorDir = tgtDir + '/vendor';
 // create test/vendor directory if necessary
 if (!fs.existsSync(vendorDir)) fs.mkdirSync(vendorDir);
 
-// copy mocha's dependencies
-fs.createReadStream(mochaDir + '/mocha.css')
+// copy mocha and sinon dependencies
+fs.createReadStream(moduleDir + '/mocha/mocha.css')
   .pipe(fs.createWriteStream(vendorDir + '/mocha.css'));
-fs.createReadStream(mochaDir + '/mocha.js')
+fs.createReadStream(moduleDir + '/mocha/mocha.js')
   .pipe(fs.createWriteStream(vendorDir + '/mocha.js'));
+fs.createReadStream(moduleDir + '/sinon/pkg/sinon.js')
+  .pipe(fs.createWriteStream(vendorDir + '/sinon.js'));
+fs.createReadStream(moduleDir + '/sinon/pkg/sinon-ie.js')
+  .pipe(fs.createWriteStream(vendorDir + '/sinon-ie.js'));
 
 // compile doT templates and store them in a dedicated file
 dotBuilder.compile(function (templates) {

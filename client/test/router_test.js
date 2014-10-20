@@ -1,5 +1,4 @@
 var assert = require('assert');
-var sinon = require('sinon');
 var Router = require('./../src/router');
 
 describe('router', function () {

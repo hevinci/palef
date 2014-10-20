@@ -8,6 +8,10 @@
 <body>
   <div id="mocha"></div>
   <div id="test-container" style="display: none"></div>
+  <!-- sinon fake server doesn't currently work in browserify -->
+  <!-- see https://github.com/cjohansen/Sinon.JS/issues/319  -->
+  <script src="vendor/sinon.js"></script>
+  <script src="vendor/sinon-ie.js"></script>
   <script src="vendor/mocha.js"></script>
   <script>mocha.setup('bdd')</script>
   <script src="templates.js"></script>
