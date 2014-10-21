@@ -3,6 +3,8 @@ require('es6-promise').polyfill();
 var db = module.exports = {};
 var connection = null;
 
+db.NoTraces = NoTraces;
+
 db.open = function (name) {
   return new Promise(function (resolve, reject) {
     var request;
@@ -92,7 +94,11 @@ db.getTraces = function () {
         });
         cursor.continue();
       } else {
-        resolve(traces);
+        if (traces.length === 0) {
+          reject(new NoTraces);
+        } else {
+          resolve(traces);
+        }
       }
     };
   });
@@ -128,3 +134,11 @@ function writeTransaction(storeName, operation) {
     };
   });
 }
+
+function NoTraces() {
+  this.name = 'NoTraces';
+  this.message = 'No traces available';
+}
+
+NoTraces.prototype = new Error();
+NoTraces.prototype.constructor = NoTraces;

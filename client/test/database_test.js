@@ -25,11 +25,11 @@ describe('database', function () {
   });
 
   describe('#getTraces', function () {
-    it('retrieves existing traces', function (done) {
+    it('returns an error if no traces are available', function (done) {
       db.open('palef-test')
         .then(db.getTraces)
-        .then(function (traces) {
-          assert.deepEqual([], traces);
+        .catch(function (error) {
+          assert.ok(error instanceof db.NoTraces);
         })
         .then(done, done);
     })
