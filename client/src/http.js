@@ -15,12 +15,12 @@ document.body.addEventListener('offline', function () {
   isNavigatorOnline = false;
 });
 
-http.NOTJSON = 'NotParsableJSON';
-http.NOT200 = 'Not200Status';
-http.FAILED = 'XHRFailure';
-http.OFFLINE = 'NavigatorOffline';
-
 http.onlineCallback = null;
+
+http.NotJsonResponse = NotJsonResponse;
+http.NotSuccessResponse = NotSuccessResponse;
+http.RequestFailure = RequestFailure;
+http.NavigatorOffline = NavigatorOffline;
 
 http.sendTraces = function (traces) {
   return postAsJson('./traces', traces);
@@ -29,7 +29,7 @@ http.sendTraces = function (traces) {
 function postAsJson(url, data) {
   return new Promise(function (resolve, reject) {
     if (!isNavigatorOnline) {
-      reject(makeError(http.OFFLINE, 'Navigator is offline'));
+      reject(new NavigatorOffline);
     }
 
     var xhr = new XMLHttpRequest();
@@ -44,19 +44,13 @@ function postAsJson(url, data) {
             try {
               resolve(JSON.parse(xhr.responseText));
             } catch (error) {
-              reject(makeError(
-                http.NOTJSON,
-                'Cannot parse JSON response: ' + error.message
-              ));
+              reject(new NotJsonResponse(error.message));
             }
           } else {
-            reject(makeError(http.NOT200, 'XHR status: ' + xhr.status));
+            reject(new NotSuccessResponse(xhr.status));
           }
         } else {
-          reject(makeError(
-            http.FAILED,
-            'XHR failed: offline, timeout or host not reachable'
-          ));
+          reject(new RequestFailure);
         }
       }
     };
@@ -64,9 +58,32 @@ function postAsJson(url, data) {
   });
 }
 
-function makeError(type, message) {
-  var error = Error(message);
-  error.name = type;
-
-  return error;
+function NotJsonResponse(message) {
+  this.name = 'NotJsonResponse';
+  this.message = 'Cannot parse response as JSON: ' + message;
 }
+
+function NotSuccessResponse(message) {
+  this.name = 'NotSuccessResponse';
+  this.message = 'Response status is: ' + message;
+}
+
+function RequestFailure() {
+  this.name = 'RequestFailure';
+  this.message = 'Request failed: offline, timeout or host not reachable';
+}
+
+function NavigatorOffline() {
+  this.name = 'NavigatorOffline';
+  this.message = 'Navigator is offline';
+}
+
+NotJsonResponse.prototype = new Error();
+NotSuccessResponse.prototype = new Error();
+RequestFailure.prototype = new Error();
+NavigatorOffline.prototype = new Error();
+
+NotJsonResponse.prototype.constructor = NotJsonResponse;
+NotSuccessResponse.prototype.constructor = NotSuccessResponse;
+RequestFailure.prototype.constructor = RequestFailure;
+NavigatorOffline.prototype.constructor = NavigatorOffline;

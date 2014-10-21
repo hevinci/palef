@@ -45,7 +45,7 @@ describe('http', function () {
       respondWith(200, '{ [not-json*": 123');
       http.sendTraces(['bar', 123])
         .catch(function (error) {
-          assert.equal(http.NOTJSON, error.name);
+          assert.ok(error instanceof http.NotJsonResponse);
         })
         .then(done, done);
     });
@@ -54,7 +54,7 @@ describe('http', function () {
       respondWith(500, '');
       http.sendTraces(['bar', 123])
         .catch(function (error) {
-          assert.equal(http.NOT200, error.name);
+          assert.ok(error instanceof http.NotSuccessResponse);
         })
         .then(done, done);
     });
@@ -63,7 +63,7 @@ describe('http', function () {
       respondWith(0, '');
       http.sendTraces(['bar', 123])
         .catch(function (error) {
-          assert.equal(http.FAILED, error.name);
+          assert.ok(error instanceof http.RequestFailure);
         })
         .then(done, done);
     });
@@ -72,7 +72,7 @@ describe('http', function () {
       document.body.dispatchEvent(helpers.createEvent('offline'));
       http.sendTraces(['bar', 123])
         .catch(function (error) {
-          assert.equal(http.OFFLINE, error.name);
+          assert.ok(error instanceof http.NavigatorOffline);
         })
         .then(done, done);
     });
