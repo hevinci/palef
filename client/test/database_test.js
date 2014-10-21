@@ -29,7 +29,7 @@ describe('database', function () {
       db.open('palef-test')
         .then(db.getTraces)
         .then(function (traces) {
-          assert.deepEqual({}, traces);
+          assert.deepEqual([], traces);
         })
         .then(done, done);
     })
@@ -43,13 +43,12 @@ describe('database', function () {
         })
         .then(db.getTraces)
         .then(function (traces) {
-          var keys = Object.keys(traces);
-          assert.equal(1, keys.length);
-          assert.equal(1, traces[1].module);
-          assert.equal(2, traces[1].step);
-          assert.equal('quiz', traces[1].type);
-          assert.equal(true, traces[1].complete);
-          assert.equal('number', typeof traces[1].time);
+          assert.equal(1, traces.length);
+          assert.equal(1, traces[0].value.module);
+          assert.equal(2, traces[0].value.step);
+          assert.equal('quiz', traces[0].value.type);
+          assert.equal(true, traces[0].value.complete);
+          assert.equal('number', typeof traces[0].value.time);
         })
         .then(done, done);
     });
@@ -69,7 +68,7 @@ describe('database', function () {
         })
         .then(db.getTraces)
         .then(function (traces) {
-          assert.equal(3, Object.keys(traces).length);
+          assert.equal(3, traces.length);
         })
         .then(function () {
           // remove the two first traces
@@ -78,8 +77,8 @@ describe('database', function () {
         .then(db.getTraces)
         .then(function (traces) {
           // third trace (id 3) still exists
-          assert.equal(1, Object.keys(traces).length);
-          assert.ok(traces[3]);
+          assert.equal(1, traces.length);
+          assert.equal(3, traces[0].key);
         })
         .then(done, done);
     });

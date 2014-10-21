@@ -70,10 +70,10 @@ db.addTrace = function (module, step, type, complete) {
   });
 };
 
-db.getTraces= function () {
+db.getTraces = function () {
   return new Promise(function (resolve, reject) {
     var transaction, store, request;
-    var traces = {};
+    var traces = [];
 
     if (!connection) {
       reject(Error('Database is not opened'));
@@ -86,7 +86,10 @@ db.getTraces= function () {
       var cursor = request.result;
 
       if (cursor) {
-        traces[cursor.key] = cursor.value;
+        traces.push({
+          key: cursor.key,
+          value: cursor.value
+        });
         cursor.continue();
       } else {
         resolve(traces);
