@@ -29,7 +29,7 @@ http.sendTraces = function (traces) {
 function postAsJson(url, data) {
   return new Promise(function (resolve, reject) {
     if (!isNavigatorOnline) {
-      reject(new NavigatorOffline);
+      return reject(new NavigatorOffline);
     }
 
     var xhr = new XMLHttpRequest();
