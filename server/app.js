@@ -12,7 +12,7 @@ app.use('/', express.static(__dirname + './../public'));
 app.get('/admin', routes.admin);
 app.post('/traces', jsonParser, routes.traces);
 
-app.use(function (err, req, res) {
+app.use(function (err, req, res, next) {
   var fallback = 'Unknown error: received error is falsy';
   console.error(err.stack || fallback);
   res.status(500).send(err.message || fallback);

@@ -10,14 +10,14 @@ Api.open = function () {
   return new Promise(function (resolve, reject) {
     client.connect(dbUrl, function(error, _db) {
       if (error) {
-        reject(error);
+        reject(Error(error));
       } else {
         if (!hasBeenOpened) {
           hasBeenOpened = true;
           _db.collection('traces')
             .ensureIndex('time', { unique: true }, function (error) {
               if (error) {
-                reject(error);
+                reject(Error(error));
               } else {
                 db = _db;
                 resolve();
