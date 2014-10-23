@@ -34,6 +34,7 @@ function postAsJson(url, data) {
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         // requests failing due to connectivity problems have a status code 0
