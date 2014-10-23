@@ -112,6 +112,12 @@ db.removeTraces = function (keys) {
   });
 };
 
+db.updateProgress = function (progress) {
+  console.log('db.updateProgress: to be implemented')
+
+  return progress; // useful for promise chaining
+};
+
 function writeTransaction(storeName, operation) {
   return new Promise(function (resolve, reject) {
     var transaction, store;
