@@ -46,7 +46,7 @@ Api.saveTraces = function (traces) {
     }
 
     db.collection('traces').insert(traces, function (error, result) {
-      return error ? reject(error) : resolve(result);
+      return error ? reject(Error(error)) : resolve(result);
     });
   });
 };
@@ -58,7 +58,7 @@ Api.fetchTraces = function () {
     }
 
     db.collection('traces').find({}).toArray(function (error, traces) {
-      return error ? reject(error) : resolve(traces);
+      return error ? reject(Error(error)) : resolve(traces);
     });
   });
 };
