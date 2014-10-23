@@ -3,66 +3,88 @@ module.exports = Syncer;
 function Syncer(db, http) {
   this.db = db;
   this.http = http;
-  this.isUnsynced = false;
+  this.isLocked = false;
+  this.requestCount = 0;
+  this.scheduleDelay = 2000;
 }
 
 Syncer.prototype.syncedCallback = null;
 
-// key...?
-Syncer.prototype.syncTrace = function (trace) {
+Syncer.prototype.syncAll = function () {
   var self = this;
 
-  if (this.isUnsynced) {
-    return this.syncAll();
+  // keep track of sync requests, whether the syncer is locked or not
+  self.requestCount++;
+
+  // prevent starting parallel sync operations (as it would end up with
+  // superfluous requests and/or duplicate data sent to the server)
+  if (self.isLocked) {
+    return;
   }
 
-  this.http.sendTraces([trace])
-    .then(function (progress) {
-      if (self.syncedCallback) {
-        self.syncedCallback(progress);
-      }
-    })
-    // remove...
-    .catch(function (error) {
-      self.isUnsynced = true;
-
-      console.log(error);
-    });
-};
-
-Syncer.prototype.syncAll = function () {
-  var self = this, traceIds = [], traceValues = [], progress;
+  // apply a lock
+  self.isLocked = true;
 
   self.db.open()
     .then(self.db.getTraces)
-    .then(function (traces) {
-      traces.forEach(function (trace) {
-        traceIds.push(trace.key);
-        traceValues.push(trace.value);
-      });
-
-      return traceValues;
-    })
+    .then(self._cacheCurrentTraces)
+    .then(self._getCachedTraceValues)
     .then(self.http.sendTraces)
-    .then(function (serverProgress) {
-      progress = serverProgress;
+    .then(self._cacheServerProgress)
+    .then(self.db.updateProgress)
+    .then(self._getCachedProgress)
+    .then(self.syncedCallback || function () {})
+    .then(self._getCachedTraceIds)
+    .then(self.db.removeTraces)
+    .then(function () {
+      // sync complete: unlocking for further requests
+      self.isLocked = false;
+      self.requestCount--;
 
-      //return self.db.updateProgress(progress);
-    })
-    .then(function () {
-      if (self.syncedCallback) {
-        self.syncedCallback(progress);
+      // if new requests were made during the previous operation,
+      // we must re-sync immediately
+      if (self.requestCount > 0) {
+        self.requestCount = 0;
+        self.syncAll();
       }
-    })
-    .then(function () {
-      return self.db.removeTraces(traceIds);
     })
     .catch(function (error) {
       if (error instanceof self.db.NoTraces) {
         console.log('No traces to sync');
+      } else if (
+        error instanceof self.http.NavigatorOffline ||
+        error instanceof self.http.RequestFailure
+      ) {
+        // sync failed, we must schedule another try
+        self.isLocked = false;
+        setTimeout(self.syncAll.bind(self), self.scheduleDelay);
       } else {
-        self.isUnsynced = true;
-        console.log(error);
+        throw error;
       }
     });
+};
+
+Syncer.prototype._cacheCurrentTraces = function (traces) {
+  this._cachedTraceIds = [];
+  this._cachedTraceValues = [];
+  traces.forEach(function (trace) {
+    this._cachedTraceIds.push(trace.key);
+    this._cachedTraceValues.push(trace.value);
+  });
+};
+
+Syncer.prototype._getCachedTraceIds = function () {
+  return this._cachedTraceIds;
+};
+
+Syncer.prototype._getCachedTraceValues = function () {
+  return this._cachedTraceValues;
+};
+
+Syncer.prototype._cacheServerProgress = function (progress) {
+  this._cachedProgress = progress;
+};
+
+Syncer.prototype._getCachedProgress = function () {
+  return this._cachedProgress;
 };
