@@ -8,6 +8,8 @@ function Syncer(db, http) {
   this.scheduleDelay = 2000;
 }
 
+Syncer.prototype.SyncerLocked = SyncerLocked;
+
 Syncer.prototype.syncedCallback = null;
 
 Syncer.prototype.syncAll = function () {
@@ -19,7 +21,7 @@ Syncer.prototype.syncAll = function () {
   // prevent starting parallel sync operations (as it would end up with
   // superfluous requests and/or duplicate data sent to the server)
   if (self.isLocked) {
-    return Promise.reject(Error('Syncer is currently locked'));
+    return Promise.reject(new SyncerLocked);
   }
 
   // apply a lock
@@ -86,3 +88,12 @@ Syncer.prototype._end = function (hasError) {
     this.syncAll();
   }
 };
+
+function SyncerLocked() {
+  this.name = 'SyncerLocked';
+  this.message = 'Syncer is currently locked (operation in progress)';
+}
+
+SyncerLocked.prototype = new Error();
+SyncerLocked.prototype.constructor = SyncerLocked;
+

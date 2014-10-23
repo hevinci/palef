@@ -64,7 +64,7 @@ describe('syncer', function () {
     testNetworkFailure(new http.RequestFailure, done);
   });
 
-  it('is locked during sync operation, but re-sync after if needed', function (done) {
+  it('is locked during sync operation, but re-syncs after if needed', function (done) {
     db.open.returns(Promise.resolve());
     db.getTraces.onCall(0).returns(Promise.resolve([{ key: 1, value: 'tr 1' }]));
     db.getTraces.onCall(1).returns(Promise.resolve([{ key: 2, value: 'tr 2' }]));
@@ -73,13 +73,16 @@ describe('syncer', function () {
     db.updateProgress.onCall(0).returns(Promise.resolve('Progress 1'));
     db.updateProgress.onCall(1).returns(Promise.resolve('Progress 2'));
 
-    // only the first call should be immediately effective
+    // "parallel" calls: only the first one should trigger a sync, others are blocked
     syncer.syncAll();
-    syncer.syncAll();
-    syncer.syncAll();
-    syncer.syncAll();
+    syncer.syncAll().catch(function (error) {
+      assert.ok(error instanceof syncer.SyncerLocked);
+    });
+    syncer.syncAll().catch(function (error) {
+      assert.ok(error instanceof syncer.SyncerLocked);
+    });
 
-    // another sync should be triggered after the first call completion
+    // a re-sync for blocked calls should be triggered after the first call completion
     setTimeout(function () {
       assert.ok(http.sendTraces.calledTwice);
       assert.ok(db.updateProgress.calledTwice);
