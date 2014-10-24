@@ -1,35 +1,33 @@
 var Promise = require('es6-promise').Promise;
 var client = require('mongodb').MongoClient;
 var dbUrl = 'mongodb://localhost:27017/palef';
-var hasBeenOpened = false;
+var isInitialized = false;
 var db;
 
 var Api = module.exports = {};
 
 Api.open = function () {
-  return new Promise(function (resolve, reject) {
-    client.connect(dbUrl, function(error, _db) {
+  var openPromise = new Promise(function (resolve, reject) {
+    client.connect(dbUrl, function (error, _db) {
       if (error) {
         reject(Error(error));
       } else {
-        if (!hasBeenOpened) {
-          hasBeenOpened = true;
-          _db.collection('traces')
-            .ensureIndex('time', { unique: true }, function (error) {
-              if (error) {
-                reject(Error(error));
-              } else {
-                db = _db;
-                resolve();
-              }
-            });
-        } else {
-          db = _db;
-          resolve();
-        }
+        db = _db;
+        resolve();
       }
     });
   });
+
+  if (!isInitialized) {
+    return openPromise
+      .then(ensureIndex)
+      .then(loadModuleStats)
+      .then(function () {
+        isInitialized = true;
+      });
+  }
+
+  return openPromise;
 };
 
 Api.close = function () {
@@ -40,25 +38,124 @@ Api.close = function () {
 };
 
 Api.saveTraces = function (traces) {
-  return new Promise(function (resolve, reject) {
-    if (!db) {
-      return reject(Error('No connection opened'));
-    }
+  return insert('traces', traces);
+};
 
-    db.collection('traces').insert(traces, function (error, result) {
-      return error ? reject(Error(error)) : resolve(result);
+Api.saveStats = function (stats) {
+  return clear('statistics')
+    .then(function () {
+      return insert('statistics', stats);
     });
-  });
 };
 
 Api.fetchTraces = function () {
+  return findAll('traces');
+};
+
+Api.fetchStats = function () {
+  return findOne('statistics', {}, { fields: { _id: 0 } });
+};
+
+function ensureIndex () {
+  return new Promise(function (resolve, reject) {
+    db.collection('traces')
+      .ensureIndex('time', { unique: true }, function (error) {
+        if (error) {
+          return reject(Error(error));
+        }
+
+        resolve();
+      });
+  });
+}
+
+function loadModuleStats() {
+  return new Promise(function (resolve, reject) {
+    var moduleStats = [];
+    var modules = [
+      require('./../fixtures/module/module1'),
+      require('./../fixtures/module/module2'),
+      require('./../fixtures/module/module3'),
+      require('./../fixtures/module/module4')
+    ];
+    modules.forEach(function (module) {
+      moduleStats.push({
+        id: module.id,
+        steps: module.steps.map(function (step, index) {
+          return {
+            id: index,
+            complete: false,
+            score: null
+          };
+        })
+      });
+    });
+    var collection = db.collection('statistics');
+    collection.remove(function (error) {
+      if (error) {
+        return reject(Error(error));
+      }
+
+      collection.insert({ modules: moduleStats}, function (error) {
+        if (error) {
+          return reject(Error(error));
+        }
+
+        resolve();
+      });
+    });
+  });
+}
+
+function insert(collection, documents) {
   return new Promise(function (resolve, reject) {
     if (!db) {
       return reject(Error('No connection opened'));
     }
 
-    db.collection('traces').find({}).toArray(function (error, traces) {
-      return error ? reject(Error(error)) : resolve(traces);
+    db.collection(collection).insert(documents, function (error, result) {
+      return error ? reject(Error(error)) : resolve(result);
     });
   });
+}
+
+function findAll(collection) {
+  return new Promise(function (resolve, reject) {
+    if (!db) {
+      return reject(Error('No connection opened'));
+    }
+
+    db.collection(collection).find({}).toArray(function (error, result) {
+      return error ? reject(Error(error)) : resolve(result);
+    });
+  });
+}
+
+function findOne(collection, query, options) {
+  return new Promise(function (resolve, reject) {
+    if (!db) {
+      return reject(Error('No connection opened'));
+    }
+
+    db.collection(collection)
+      .findOne(query, options, function (error, document) {
+        return error ? reject(Error(error)) : resolve(document);
+      });
+  });
 };
+
+function clear(collectionName) {
+  return new Promise(function (resolve, reject) {
+    if (!db) {
+      return reject(Error('No connection opened'));
+    }
+
+    db.collection(collectionName).remove(function (error) {
+      if (error) {
+        return reject(Error(error));
+      }
+
+      resolve();
+    });
+  });
+}
