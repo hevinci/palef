@@ -55,7 +55,7 @@ describe('syncer', function () {
     db.open.returns(Promise.resolve());
     db.getTraces.onCall(0).returns(Promise.resolve([{ key: 1, value: 'tr 1' }]));
     db.getTraces.onCall(1).returns(Promise.resolve([{ key: 2, value: 'tr 2' }]));
-    http.sendTraces.onCall(0).returns(fakeDelayedHttp(10, 'Progress 1'));
+    http.sendTraces.onCall(0).returns(makeWaitPromise(10, 'Progress 1')());
     http.sendTraces.onCall(1).returns(Promise.resolve('Progress 2'));
     db.updateProgress.onCall(0).returns(Promise.resolve('Progress 1'));
     db.updateProgress.onCall(1).returns(Promise.resolve('Progress 2'));
@@ -63,67 +63,70 @@ describe('syncer', function () {
     // "parallel" calls: only the first one should trigger a
     // sync, others should be blocked
     syncer.syncAll();
-    syncer.syncAll().catch(function (error) {
-      assert.ok(error instanceof syncer.SyncerLocked);
-    });
-    syncer.syncAll().catch(function (error) {
-      assert.ok(error instanceof syncer.SyncerLocked);
-    });
+    syncer.syncAll().then(throwTestFailure, makeAssertError(syncer.SyncerLocked));
+    syncer.syncAll().then(throwTestFailure, makeAssertError(syncer.SyncerLocked));
+    syncer.syncAll().then(throwTestFailure, makeAssertError(syncer.SyncerLocked));
 
     // a re-sync for blocked calls should be triggered after
     // the first call completion
-    setTimeout(function () {
-      assert.ok(http.sendTraces.calledTwice);
-      assert.ok(db.updateProgress.calledTwice);
-      assert.ok(syncer.syncedCallback.calledTwice);
-      assert.ok(db.removeTraces.calledTwice);
-      assert.deepEqual(http.sendTraces.getCall(0).args[0], ['tr 1']);
-      assert.deepEqual(http.sendTraces.getCall(1).args[0], ['tr 2']);
-      assert.equal(db.updateProgress.getCall(0).args[0], 'Progress 1');
-      assert.equal(db.updateProgress.getCall(1).args[0], 'Progress 2');
-      assert.equal(syncer.syncedCallback.getCall(0).args[0], 'Progress 1');
-      assert.equal(syncer.syncedCallback.getCall(1).args[0], 'Progress 2');
-      assert.deepEqual(db.removeTraces.getCall(0).args[0], [1]);
-      assert.deepEqual(db.removeTraces.getCall(1).args[0], [2]);
-      done();
-    }, 30);
+    makeWaitPromise(100)()
+      .then(function () {
+        assert.ok(http.sendTraces.calledTwice);
+        assert.ok(db.updateProgress.calledTwice);
+        assert.ok(syncer.syncedCallback.calledTwice);
+        assert.ok(db.removeTraces.calledTwice);
+        assert.deepEqual(http.sendTraces.getCall(0).args[0], ['tr 1']);
+        assert.deepEqual(http.sendTraces.getCall(1).args[0], ['tr 2']);
+        assert.equal(db.updateProgress.getCall(0).args[0], 'Progress 1');
+        assert.equal(db.updateProgress.getCall(1).args[0], 'Progress 2');
+        assert.equal(syncer.syncedCallback.getCall(0).args[0], 'Progress 1');
+        assert.equal(syncer.syncedCallback.getCall(1).args[0], 'Progress 2');
+        assert.deepEqual(db.removeTraces.getCall(0).args[0], [1]);
+        assert.deepEqual(db.removeTraces.getCall(1).args[0], [2]);
+      })
+      .then(done, done);
   });
 
-  function testNetworkFailure(testedError, done) {
+  function testNetworkFailure(expectedError, done) {
     db.open.returns(Promise.resolve());
     db.getTraces.returns(Promise.resolve(dbTraces));
-    http.sendTraces.onCall(0).returns(Promise.reject(new testedError));
+    http.sendTraces.onCall(0).returns(Promise.reject(new expectedError));
     http.sendTraces.onCall(1).returns(Promise.resolve(progress));
     db.updateProgress.returns(Promise.resolve(progress));
-    syncer.scheduleDelay = 10;
+    syncer.scheduleDelay = 2;
 
-    var firstAttempt = syncer.syncAll();
-
-    setTimeout(function () {
-      firstAttempt.then(
-        function () {
-          throw new Error('First attempt should not be successful');
-        },
-        function (error) {
-          assert.ok(error instanceof testedError);
-          assert.ok(http.sendTraces.calledTwice);
-          assert.ok(db.updateProgress.calledOnce);
-          assert.ok(db.updateProgress.calledWith(progress));
-          assert.ok(syncer.syncedCallback.calledOnce);
-          assert.ok(syncer.syncedCallback.calledWith(progress));
-          assert.ok(db.removeTraces.calledOnce);
-          assert.ok(db.removeTraces.calledWith([1, 2, 3]));
-        }
-      )
+    syncer.syncAll()
+      .then(throwTestFailure, makeAssertError(expectedError))
+      .then(makeWaitPromise(100))
+      .then(function () {
+        assert.ok(http.sendTraces.calledTwice);
+        assert.ok(db.updateProgress.calledOnce);
+        assert.ok(db.updateProgress.calledWith(progress));
+        assert.ok(syncer.syncedCallback.calledOnce);
+        assert.ok(syncer.syncedCallback.calledWith(progress));
+        assert.ok(db.removeTraces.calledOnce);
+        assert.ok(db.removeTraces.calledWith([1, 2, 3]));
+      })
       .then(done, done);
-    }, 15);
   }
 
-  function fakeDelayedHttp(delay, response) {
-    return new Promise(function (resolve) {
-      setTimeout(function () {
-        resolve(response);
-      }, delay);
-    });
+  function makeWaitPromise(delay, resolvedValue) {
+    return function () {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(resolvedValue);
+        }, delay);
+      });
+    }
+  }
+
+  function throwTestFailure() {
+    throw new Error('Sync attempt should not be successful');
+  }
+
+  function makeAssertError(expectedError) {
+    return function (error) {
+      assert.ok(error instanceof expectedError);
+    };
   }
 });
