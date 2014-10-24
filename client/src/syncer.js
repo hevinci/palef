@@ -6,6 +6,9 @@ function Syncer(db, http, debug) {
   this.isLocked = false;
   this.requestStack = 0;
   this.scheduleDelay = 2000;
+  this.cachedTraceIds = null;
+  this.cachedTraceValues = null;
+  this.cachedProgress = null;
   this.log = debug ?
     console.debug.bind(console) :
     function () {};
@@ -49,29 +52,39 @@ Syncer.prototype._doSyncAll = function (isScheduled) {
     .then(self._cacheCurrentTraces.bind(self))
     .then(self._getCachedTraceValues.bind(self))
     .then(self.http.sendTraces)
-    .then(self.db.updateProgress)
-    .then(self.syncedCallback || function () {})
+    .then(self._cacheServerProgress.bind(self))
     .then(self._getCachedTraceIds.bind(self))
     .then(self.db.removeTraces)
+    .then(self._getCachedProgress.bind(self))
+    .then(self.db.updateProgress)
+    .then(self.syncedCallback || function () {})
     .then(self._onSuccess.bind(self))
     .catch(self._onError.bind(self));
 };
 
 Syncer.prototype._cacheCurrentTraces = function (traces) {
-  this._cachedTraceIds = [];
-  this._cachedTraceValues = [];
+  this.cachedTraceIds = [];
+  this.cachedTraceValues = [];
   traces.forEach(function (trace) {
-    this._cachedTraceIds.push(trace.key);
-    this._cachedTraceValues.push(trace.value);
+    this.cachedTraceIds.push(trace.key);
+    this.cachedTraceValues.push(trace.value);
   }, this);
 };
 
 Syncer.prototype._getCachedTraceIds = function () {
-  return this._cachedTraceIds;
+  return this.cachedTraceIds;
 };
 
 Syncer.prototype._getCachedTraceValues = function () {
-  return this._cachedTraceValues;
+  return this.cachedTraceValues;
+};
+
+Syncer.prototype._cacheServerProgress = function (progress) {
+  this.cachedProgress = progress;
+};
+
+Syncer.prototype._getCachedProgress = function () {
+  return this.cachedProgress;
 };
 
 Syncer.prototype._onSuccess = function () {

@@ -33,12 +33,12 @@ describe('syncer', function () {
         assert.ok(db.getTraces.calledAfter(db.open));
         assert.ok(http.sendTraces.calledAfter(db.getTraces));
         assert.ok(http.sendTraces.calledWith(['tr 1', 'tr 2', 'tr 3']));
-        assert.ok(db.updateProgress.calledAfter(http.sendTraces));
+        assert.ok(db.removeTraces.calledAfter(http.sendTraces));
+        assert.ok(db.removeTraces.calledWith([1, 2, 3]));
+        assert.ok(db.updateProgress.calledAfter(db.removeTraces));
         assert.ok(db.updateProgress.calledWith(progress));
         assert.ok(syncer.syncedCallback.calledAfter(db.updateProgress));
         assert.ok(syncer.syncedCallback.calledWith(progress));
-        assert.ok(db.removeTraces.calledAfter(syncer.syncedCallback));
-        assert.ok(db.removeTraces.calledWith([1, 2, 3]));
       })
       .then(done, done);
   });
