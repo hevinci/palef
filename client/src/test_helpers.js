@@ -2,27 +2,28 @@ require('es6-promise').polyfill();
 require('document-register-element');
 
 var assert = require('assert');
+var helpers = module.exports = {};
 var testContainer = document.querySelector('#test-container');
 var defaultElement = testContainer;
 var waitTime = 10;
 
-function setWaitTime(time) {
+helpers.setWaitTime = function (time) {
   waitTime = time;
-}
+};
 
-function setDefaultElement(element) {
+helpers.setDefaultElement = function (element) {
   defaultElement = element;
-}
+};
 
-function appendElement(element) {
+helpers.appendElement = function (element) {
   testContainer.appendChild(element);
 };
 
-function clean() {
+helpers.clean = function () {
   testContainer.innerHTML = '';
-}
+};
 
-function select(selector) {
+helpers.select = function (selector) {
   var element = defaultElement.querySelector(selector);
 
   if (element) {
@@ -30,12 +31,12 @@ function select(selector) {
   }
 
   throw new Error ('No element matches the selector "' + selector + '"');
-}
+};
 
-function click(selector) {
+helpers.click = function (selector) {
   return new Promise(function (resolve, reject) {
     try {
-      var element = select(selector);
+      var element = helpers.select(selector);
     } catch (error) {
       reject(error);
     }
@@ -49,9 +50,16 @@ function click(selector) {
     element.dispatchEvent(event);
     setTimeout(resolve, waitTime);
   });
+};
+
+helpers.createEvent = function (name) {
+  var event = document.createEvent('Event');
+  event.initEvent(name, true, true);
+
+  return event;
 }
 
-function assertElement(element, shouldBeFilled) {
+helpers.assertElement = function (element, shouldBeFilled) {
   assert.ok(element instanceof HTMLElement);
 
   if (shouldBeFilled) {
@@ -61,12 +69,3 @@ function assertElement(element, shouldBeFilled) {
   }
 };
 
-module.exports = {
-  click: click,
-  setWaitTime: setWaitTime,
-  setDefaultElement: setDefaultElement,
-  appendElement: appendElement,
-  clean: clean,
-  select: select,
-  assertElement: assertElement
-};

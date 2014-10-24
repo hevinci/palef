@@ -1,5 +1,4 @@
 var assert = require('assert');
-var sinon = require('sinon');
 var helpers = require('./../../src/test_helpers');
 
 require('./../../src/component/quiz_item_text');

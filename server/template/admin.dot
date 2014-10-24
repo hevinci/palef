@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Admin</title>
+  <meta name="description" content="Plateforme d'amélioration de la maîtrise de la langue française">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <h3>Traces</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Module</th>
+        <th>Step</th>
+        <th>Complete</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{~ it.traces :value:index }}
+      <tr>
+        <td>{{=value.module }}</td>
+        <td>{{=value.step }}</td>
+        <td>{{=value.complete }}</td>
+        <td>{{=value.time }}</td>
+      </tr>
+      {{~}}
+    </tbody>
+</body>
+</html>

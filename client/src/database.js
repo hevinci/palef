@@ -1,52 +1,140 @@
-var db = null;
-var Api = {};
+require('es6-promise').polyfill();
 
-Api.open = function () {
+var db = module.exports = {};
+var connection = null;
+
+db.open = function (name) {
   return new Promise(function (resolve, reject) {
-    if (db) {
-      return resolve();
+    var request;
+
+    if (connection) {
+      return resolve(connection);
     }
 
-    var req = indexedDB.open('palef', 1);
-    req.onsuccess = function () {
-      db = this.result;
-      resolve();
+    request = indexedDB.open(name || 'palef', 1);
+    request.onsuccess = function () {
+      connection = this.result;
+      resolve(connection);
     };
-    req.onerror = function (event) {
-      reject(Error(event.target.errorCode));
+    request.onerror = function (event) {
+      reject(Error('Db open request error: ' + event.target.errorCode));
     };
-    req.onupgradeneeded = function (ev) {
-      var traceStore = this.result.createObjectStore('traces', {
-        keyPath: 'id',
-        autoIncrement: true
-      });
-      traceStore.createIndex('module', 'module', { unique: false });
-      traceStore.createIndex('step', 'step', { unique: false });
-      traceStore.createIndex('type', 'type', { unique: false });
-      traceStore.createIndex('complete', 'complete', { unique: false });
-      traceStore.createIndex('time', 'time', { unique: false });
+    request.onblocked = function () {
+      reject(Error('Cannot open db: request is blocked'));
+    };
+    request.onupgradeneeded = function () {
+      this.result.createObjectStore('traces', { autoIncrement: true });
+      this.result.createObjectStore('stats');
     };
   });
 };
 
-Api.addTrace = function (module, step, type, complete) {
+db.destroy = function (name) {
+  name = name || 'palef';
+
   return new Promise(function (resolve, reject) {
-    if (!db) {
-      reject(Error('Database is not opened'));
+    var request;
+
+    if (!connection) {
+      return resolve(Error('Cannot destroy db: no connection opened'));
     }
-    var store = db.transaction('traces', 'readwrite').objectStore('traces');
-    var req = store.add({
+
+    connection.close();
+    request = indexedDB.deleteDatabase(name);
+    request.onsuccess = function () {
+      connection = null;
+      resolve();
+    };
+    request.onerror = function (event) {
+      reject(Error(
+          'Error while deleting db: ' + event.target.errorCode
+      ));
+    };
+    request.onblocked = function () {
+      reject(Error(
+          'Cannot destroy db "' + name + '": request has been blocked'
+      ));
+    };
+  });
+};
+
+db.addTrace = function (module, step, type, complete) {
+  return writeTransaction('traces', function (store) {
+    store.add({
       module: module,
       step: step,
       type: type,
       complete: complete,
-      time: new Date().toString()
+      time: Date.now()
     });
-    req.onsuccess = resolve;
-    req.onerror = function () {
-      reject(Error(this.error));
+  });
+};
+
+db.getTraces = function () {
+  return new Promise(function (resolve, reject) {
+    var transaction, store, request;
+    var traces = [];
+
+    if (!connection) {
+      return reject(Error('Database is not opened'));
+    }
+
+    transaction = connection.transaction('traces', 'readonly');
+    store = transaction.objectStore('traces');
+    request = store.openCursor();
+    request.onsuccess = function () {
+      var cursor = request.result;
+
+      if (cursor) {
+        traces.push({
+          key: cursor.key,
+          value: cursor.value
+        });
+        cursor.continue();
+      } else {
+        resolve(traces);
+      }
     };
   });
 };
 
-module.exports = Api;
+db.removeTraces = function (keys) {
+  if (keys.length === 0) {
+    return Promise.resolve();
+  }
+
+  return writeTransaction('traces', function (store) {
+    keys.forEach(function (key) {
+      store.delete(key);
+    });
+  });
+};
+
+db.updateProgress = function (progress) {
+  return writeTransaction('stats', function (store) {
+    store.put(progress, 'progress');
+  });
+};
+
+function writeTransaction(storeName, operation) {
+  return new Promise(function (resolve, reject) {
+    var transaction, store;
+
+    if (!connection) {
+      return reject(Error('Database is not opened'));
+    }
+
+    transaction = connection.transaction(storeName, 'readwrite');
+    store = transaction.objectStore(storeName);
+    operation(store);
+    transaction.oncomplete = function () {
+      resolve();
+    };
+    transaction.onabort = function () {
+      reject(this.error);
+    };
+    transaction.onerror = function () {
+      reject(this.error);
+    };
+  });
+}

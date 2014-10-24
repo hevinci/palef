@@ -25,12 +25,12 @@ module.exports = {
             { uid: 1, text: "True" },
             { uid: 2, text: "False" }
           ]
-        }
-      },
-      solutions: [
-        { uid: 1, score: 2 },
-        { uid: 2, score: 0 }
-      ]
+        },
+        solutions: [
+          { uid: 1, score: 2 },
+          { uid: 2, score: 0 }
+        ]
+      }
     }
   ]
 };

@@ -12,17 +12,26 @@ listPrototype.setModules = function (modules) {
     var fragment = document.createDocumentFragment();
 
     modules.forEach(function (module) {
-      var item = document.createElement('li');
-      var anchor = document.createElement('a');
-      anchor.href = '#modules/' + module.id;
-      anchor.appendChild(document.createTextNode(module.title));
-      item.appendChild(anchor);
-      fragment.appendChild(item);
-    });
+      fragment.appendChild(this._buildModuleInfo({
+        id: module.id,
+        title: module.title,
+        progress: module.progress
+      }));
+    }, this);
 
     this.appendChild(fragment);
     this.isBound = true;
   }
+};
+
+listPrototype._buildModuleInfo = function (info) {
+  var item = document.createElement('li');
+  var anchor = document.createElement('a');
+  anchor.href = '#modules/' + info.id;
+  anchor.appendChild(document.createTextNode(info.title));
+  item.appendChild(anchor);
+
+  return item;
 };
 
 document.registerElement('module-list', { prototype: listPrototype });
