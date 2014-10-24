@@ -43,25 +43,12 @@ describe('syncer', function () {
       .then(done, done);
   });
 
-  it('stops if no traces are available', function (done) {
-    db.open.returns(Promise.resolve());
-    db.getTraces.returns(Promise.reject(new db.NoTraces));
-
-    syncer.syncAll()
-      .then(function () {
-        assert.ok(!http.sendTraces.called);
-        assert.ok(!syncer.syncedCallback.called);
-        assert.ok(!db.removeTraces.called);
-      })
-      .then(done, done);
-  });
-
   it('schedules another sync if navigator is offline', function (done) {
-    testNetworkFailure(new http.NavigatorOffline, done);
+    testNetworkFailure(http.NavigatorOffline, done);
   });
 
   it('schedules another sync if xhr request failed', function (done) {
-    testNetworkFailure(new http.RequestFailure, done);
+    testNetworkFailure(http.RequestFailure, done);
   });
 
   it('is locked during sync operation, but re-syncs after if needed', function (done) {
@@ -73,7 +60,8 @@ describe('syncer', function () {
     db.updateProgress.onCall(0).returns(Promise.resolve('Progress 1'));
     db.updateProgress.onCall(1).returns(Promise.resolve('Progress 2'));
 
-    // "parallel" calls: only the first one should trigger a sync, others are blocked
+    // "parallel" calls: only the first one should trigger a
+    // sync, others should be blocked
     syncer.syncAll();
     syncer.syncAll().catch(function (error) {
       assert.ok(error instanceof syncer.SyncerLocked);
@@ -82,7 +70,8 @@ describe('syncer', function () {
       assert.ok(error instanceof syncer.SyncerLocked);
     });
 
-    // a re-sync for blocked calls should be triggered after the first call completion
+    // a re-sync for blocked calls should be triggered after
+    // the first call completion
     setTimeout(function () {
       assert.ok(http.sendTraces.calledTwice);
       assert.ok(db.updateProgress.calledTwice);
@@ -100,17 +89,23 @@ describe('syncer', function () {
     }, 30);
   });
 
-  function testNetworkFailure(testedError, doneCallback) {
+  function testNetworkFailure(testedError, done) {
     db.open.returns(Promise.resolve());
     db.getTraces.returns(Promise.resolve(dbTraces));
-    http.sendTraces.onCall(0).returns(Promise.reject(testedError));
+    http.sendTraces.onCall(0).returns(Promise.reject(new testedError));
     http.sendTraces.onCall(1).returns(Promise.resolve(progress));
     db.updateProgress.returns(Promise.resolve(progress));
     syncer.scheduleDelay = 10;
 
-    syncer.syncAll()
-      .then(function () {
-        setTimeout(function () {
+    var firstAttempt = syncer.syncAll();
+
+    setTimeout(function () {
+      firstAttempt.then(
+        function () {
+          throw new Error('First attempt should not be successful');
+        },
+        function (error) {
+          assert.ok(error instanceof testedError);
           assert.ok(http.sendTraces.calledTwice);
           assert.ok(db.updateProgress.calledOnce);
           assert.ok(db.updateProgress.calledWith(progress));
@@ -118,9 +113,10 @@ describe('syncer', function () {
           assert.ok(syncer.syncedCallback.calledWith(progress));
           assert.ok(db.removeTraces.calledOnce);
           assert.ok(db.removeTraces.calledWith([1, 2, 3]));
-          doneCallback();
-        }, 15);
-      });
+        }
+      )
+      .then(done, done);
+    }, 15);
   }
 
   function fakeDelayedHttp(delay, response) {

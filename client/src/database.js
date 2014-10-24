@@ -3,8 +3,6 @@ require('es6-promise').polyfill();
 var db = module.exports = {};
 var connection = null;
 
-db.NoTraces = NoTraces;
-
 db.open = function (name) {
   return new Promise(function (resolve, reject) {
     var request;
@@ -26,7 +24,7 @@ db.open = function (name) {
     };
     request.onupgradeneeded = function () {
       this.result.createObjectStore('traces', { autoIncrement: true });
-      this.result.createObjectStore('progress', { keyPath: 'moduleId' });
+      this.result.createObjectStore('stats');
     };
   });
 };
@@ -78,7 +76,7 @@ db.getTraces = function () {
     var traces = [];
 
     if (!connection) {
-      reject(Error('Database is not opened'));
+      return reject(Error('Database is not opened'));
     }
 
     transaction = connection.transaction('traces', 'readonly');
@@ -94,17 +92,17 @@ db.getTraces = function () {
         });
         cursor.continue();
       } else {
-        if (traces.length === 0) {
-          reject(new NoTraces);
-        } else {
-          resolve(traces);
-        }
+        resolve(traces);
       }
     };
   });
 };
 
 db.removeTraces = function (keys) {
+  if (keys.length === 0) {
+    return Promise.resolve();
+  }
+
   return writeTransaction('traces', function (store) {
     keys.forEach(function (key) {
       store.delete(key);
@@ -113,9 +111,9 @@ db.removeTraces = function (keys) {
 };
 
 db.updateProgress = function (progress) {
-  console.log('db.updateProgress: to be implemented')
-
-  return progress; // useful for promise chaining
+  return writeTransaction('stats', function (store) {
+    store.put(progress, 'progress');
+  });
 };
 
 function writeTransaction(storeName, operation) {
@@ -123,7 +121,7 @@ function writeTransaction(storeName, operation) {
     var transaction, store;
 
     if (!connection) {
-      reject(Error('Database is not opened'));
+      return reject(Error('Database is not opened'));
     }
 
     transaction = connection.transaction(storeName, 'readwrite');
@@ -140,11 +138,3 @@ function writeTransaction(storeName, operation) {
     };
   });
 }
-
-function NoTraces() {
-  this.name = 'NoTraces';
-  this.message = 'No traces available';
-}
-
-NoTraces.prototype = new Error();
-NoTraces.prototype.constructor = NoTraces;

@@ -12,13 +12,19 @@ routes.admin = function (req, res, next) {
 };
 
 routes.traces = function (req, res, next) {
-  db.open()
-    .then(function () {
-      return db.saveTraces(req.body);
-    })
-    .then(function () {
-      db.close();
-      res.send('["Traces saved on server"]');
-    })
-    .catch(next);
+  var msg = '["Progress from server: ' + Date.now() + '"]';
+
+  if (req.body.length === 0) {
+    res.send(msg);
+  } else {
+    db.open()
+      .then(function () {
+        return db.saveTraces(req.body);
+      })
+      .then(function () {
+        db.close();
+        res.send(msg);
+      })
+      .catch(next);
+  }
 };

@@ -16,23 +16,12 @@ describe('database', function () {
           assert.equal('palef-test', _db.name);
           assert.equal(2, _db.objectStoreNames.length);
           assert.deepEqual(
-            ['progress', 'traces'],
+            ['stats', 'traces'],
             [].slice.call(_db.objectStoreNames)
           );
         })
         .then(done, done);
     });
-  });
-
-  describe('#getTraces', function () {
-    it('returns an error if no traces are available', function (done) {
-      db.open('palef-test')
-        .then(db.getTraces)
-        .catch(function (error) {
-          assert.ok(error instanceof db.NoTraces);
-        })
-        .then(done, done);
-    })
   });
 
   describe('#addTrace', function () {

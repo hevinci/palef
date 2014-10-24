@@ -4,8 +4,17 @@ require('document-register-element');
 require('./component/app_palef');
 
 var app = document.createElement('app-palef');
+var db = require('./database');
+var http = require('./http');
+var Syncer = require('./syncer');
 var Router = require('./router');
 var router = new Router();
+var syncer = new Syncer(db, http, true);
+
+app.traceCallback = syncer.syncAll.bind(syncer);
+
+// tmp: no op
+syncer.syncedCallback = function (progress) {};
 
 var modules = [
   require('./../../fixtures/module/module1'),
@@ -31,9 +40,4 @@ router.add(/.*/, function () {
 });
 
 router.start();
-
-// TMP
-var HttpClient = require('./http_client');
-var client = new HttpClient();
-client.initListeners();
-//client.postAsJson('http://localhost/test.php', {});
+syncer.syncAll();

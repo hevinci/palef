@@ -20,6 +20,8 @@ appPrototype.createdCallback = function () {
   this._build();
 };
 
+appPrototype.traceCallback = null;
+
 appPrototype.setModules = function (modules) {
   this.modules = modules;
 };
@@ -76,8 +78,10 @@ appPrototype._switchTo = function (element) {
 };
 
 appPrototype._resolveStep = function (step, moduleId, stepId) {
+  var self = this;
+
   if (step.type === 'text') {
-    saveTrace(moduleId, stepId, 'text', true);
+    self._saveTrace(moduleId, stepId, 'text', true);
 
     return document.createTextNode(step.data);
   }
@@ -87,7 +91,7 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
     quiz.setChallenge(step.data.challenge);
     quiz.validatedCallback = function () {
       var score = quiz.computeScore(step.data.solutions);
-      saveTrace(moduleId, stepId, 'quiz-choice', score);
+      self._saveTrace(moduleId, stepId, 'quiz-choice', score);
     };
     return quiz;
   }
@@ -95,12 +99,17 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
   throw new Error('Unknown step type "' + step.type + '"');
 };
 
-function saveTrace(moduleId, stepId, type, completed) {
-  db.open().then(function () {
-    db.addTrace(moduleId, stepId, type, completed);
-  }).catch(function (err) {
-      console.error(err);
-  });
-}
+appPrototype._saveTrace = function (moduleId, stepId, type, completed) {
+  var self = this;
+
+  db.open()
+    .then(function () {
+      return db.addTrace(moduleId, stepId, type, completed);
+    })
+    .then(self.traceCallback.bind(self) || function () {})
+    .catch(function (err) {
+      console.debug(err);
+    });
+};
 
 document.registerElement('app-palef', { prototype: appPrototype });
