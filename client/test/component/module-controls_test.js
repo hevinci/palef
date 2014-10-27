@@ -1,7 +1,7 @@
 var assert = require('assert');
-var helpers = require('./../../src/test_helpers');
+var helpers = require('./../../src/test-helpers');
 
-require('./../../src/component/module_controls');
+require('./../../src/component/module-controls');
 
 describe('component/module-controls', function () {
   var controls;

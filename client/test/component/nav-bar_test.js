@@ -1,7 +1,7 @@
 var assert = require('assert');
-var helpers = require('./../../src/test_helpers');
+var helpers = require('./../../src/test-helpers');
 
-require('./../../src/component/nav_bar');
+require('./../../src/component/nav-bar');
 
 describe('component/nav-bar', function () {
   var nav;

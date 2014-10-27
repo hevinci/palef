@@ -1,7 +1,7 @@
 // add global promise polyfill in browsers
 require('es6-promise').polyfill();
 require('document-register-element');
-require('./component/app_palef');
+require('./component/app-palef');
 
 var app = document.createElement('app-palef');
 var db = require('./database');
