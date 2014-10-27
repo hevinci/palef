@@ -1,5 +1,6 @@
 var fs = require('fs');
 var glob = require('glob');
+var minify = require('html-minifier').minify;
 var componentDir = __dirname + '/../../client/src/component';
 var templates = {};
 
@@ -14,7 +15,10 @@ module.exports.getLayouts = function (callback) {
     files.forEach(function (file) {
       var name =  file.match(/(.+)\.html$/)[1];
       var content = fs.readFileSync(componentDir + '/' + file, 'utf8');
-      templates[name] = content;
+      templates[name] = minify(content, {
+        removeComments: true,
+        collapseWhitespace: true
+      });
     });
 
     callback(JSON.stringify(templates));
