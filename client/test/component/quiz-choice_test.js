@@ -1,7 +1,7 @@
 var assert = require('assert');
-var helpers = require('./../../src/test_helpers');
+var helpers = require('./../../src/test-helpers');
 
-require('./../../src/component/quiz_choice');
+require('./../../src/component/quiz-choice');
 
 describe('component/quiz-choice', function () {
   var quiz, baseChallenge, baseSolutions;
@@ -67,17 +67,22 @@ describe('component/quiz-choice', function () {
       quiz.validatedCallback = callback;
       quiz.setChallenge(baseChallenge);
 
-      helpers.click('button').then(function () {
-        assert.equal(callback.called, false); // no answer is selected
-        helpers.click('label').then(function () { // select an answer
-          helpers.click('button').then(function () { // validate
-            assert.ok(callback.calledOnce);
-            assert.equal(1, quiz.chosenItemUids.length);
-            assert.equal(baseSolutions[0].uid, quiz.chosenItemUids[0]);
-            done();
-          });
-        });
-      });
+      helpers.click('button')
+        .then(function () {
+          assert.equal(callback.called, false); // no answer is selected
+        })
+        .then(function () {
+          return helpers.click('label');
+        })
+        .then(function () {
+          return helpers.click('button'); // validate
+        })
+        .then(function () {
+          assert.ok(callback.calledOnce);
+          assert.equal(1, quiz.chosenItemUids.length);
+          assert.equal(baseSolutions[0].uid, quiz.chosenItemUids[0]);
+        })
+        .then(done, done);
     });
   });
 });

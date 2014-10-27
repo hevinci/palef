@@ -1,7 +1,7 @@
 var fs = require('fs');
 var glob = require('glob');
 var browserify = require('browserify')();
-var dotBuilder = require('./dot');
+var componentBuilder = require('./component');
 var moduleDir = __dirname + '/../../node_modules';
 var testDir = __dirname + '/../../client/test';
 var tgtDir = __dirname + '/../../public/test';
@@ -20,11 +20,11 @@ fs.createReadStream(moduleDir + '/sinon/pkg/sinon.js')
 fs.createReadStream(moduleDir + '/sinon/pkg/sinon-ie.js')
   .pipe(fs.createWriteStream(vendorDir + '/sinon-ie.js'));
 
-// compile doT templates and store them in a dedicated file
-dotBuilder.compile(function (templates) {
+// gather component layouts and store them in a dedicated file
+componentBuilder.getLayouts(function (templates) {
   fs.writeFileSync(
     tgtDir + '/templates.js',
-    'window.Templates = ' + templates.fragments
+    'window.Templates = ' + templates + ';'
   );
 });
 

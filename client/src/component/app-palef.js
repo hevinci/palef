@@ -1,8 +1,8 @@
-require('./nav_bar');
-require('./module_list');
-require('./module_status');
-require('./module_controls');
-require('./quiz_choice');
+require('./nav-bar');
+require('./module-list');
+require('./module-status');
+require('./module-controls');
+require('./quiz-choice');
 
 var db = require('./../database');
 

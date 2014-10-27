@@ -14,6 +14,7 @@
 </head>
 <body>
   <script type="text/javascript">
+    var Templates = {{= it.layouts }};
     {{= it.scripts }}
   </script>
 </body>
