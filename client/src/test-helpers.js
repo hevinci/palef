@@ -69,3 +69,30 @@ helpers.assertElement = function (element, shouldBeFilled) {
   }
 };
 
+helpers.makeWaitPromise = function (delay, resolvedValue) {
+  return function () {
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        resolve(resolvedValue);
+      }, delay);
+    });
+  }
+};
+
+helpers.makeTestFailure = function (message) {
+  return function () {
+    throw new Error(message);
+  };
+};
+
+helpers.makeAssertError = function (expectedError) {
+  return function (error) {
+    if (!(error instanceof expectedError)) {
+      console.error(
+        'Test failure: expected this error:\n\n', expectedError,
+        '\n\nbut received this one:\n\n', error
+      );
+    }
+    assert.ok(error instanceof expectedError);
+  };
+};

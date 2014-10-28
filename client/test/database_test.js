@@ -1,5 +1,7 @@
 var assert = require('assert');
+var helpers = require('./../src/test-helpers');
 var db = require('./../src/database');
+var Trace = require('./../src/trace');
 
 describe('database', function () {
 
@@ -28,7 +30,7 @@ describe('database', function () {
     it('adds a trace in the traces store', function (done) {
       db.open('palef-test')
         .then(function () {
-          return db.addTrace(1, 2, 'quiz', true);
+          return db.addTrace(new Trace(1, 2, 'quiz', 10));
         })
         .then(db.getTraces)
         .then(function (traces) {
@@ -36,9 +38,21 @@ describe('database', function () {
           assert.equal(1, traces[0].value.module);
           assert.equal(2, traces[0].value.step);
           assert.equal('quiz', traces[0].value.type);
-          assert.equal(true, traces[0].value.complete);
+          assert.equal(10, traces[0].value.score);
           assert.equal('number', typeof traces[0].value.time);
         })
+        .then(done, done);
+    });
+
+    it('throws an error if trace is not of the expected type', function (done) {
+      db.open('palef-test')
+        .then(function () {
+          return db.addTrace('foo');
+        })
+        .then(
+          helpers.makeTestFailure('An error should have been thrown'),
+          helpers.makeAssertError(TypeError)
+        )
         .then(done, done);
     });
   });
@@ -47,13 +61,13 @@ describe('database', function () {
     it('removes traces with the given ids', function (done) {
       db.open('palef-test')
         .then(function () {
-          return db.addTrace(1, 1, 'text', true);
+          return db.addTrace(new Trace(1, 1, 'text'));
         })
         .then(function () {
-          return db.addTrace(1, 2, 'quiz', true);
+          return db.addTrace(new Trace(1, 2, 'quiz', 5));
         })
         .then(function () {
-          return db.addTrace(1, 3, 'quiz', true);
+          return db.addTrace(new Trace(1, 3, 'quiz', 7));
         })
         .then(db.getTraces)
         .then(function (traces) {

@@ -4,11 +4,13 @@ require('./module-status');
 require('./module-controls');
 require('./quiz-choice');
 
-var db = require('./../database');
-
+var Trace = require('./../trace');
 var appPrototype = Object.create(HTMLElement.prototype);
 
 appPrototype.createdCallback = function () {
+  // tmp
+  this.monitor = null;
+
   this.modules = [];
   this.navBar = null;
   this.moduleStatus = null;
@@ -22,6 +24,12 @@ appPrototype.createdCallback = function () {
 
 appPrototype.traceCallback = null;
 
+// tmp
+appPrototype.setMonitor = function (monitor) {
+  this.monitor = monitor;
+};
+
+// tmp
 appPrototype.setModules = function (modules) {
   this.modules = modules;
 };
@@ -112,16 +120,7 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
 };
 
 appPrototype._saveTrace = function (moduleId, stepId, type, completed) {
-  var self = this;
-
-  db.open()
-    .then(function () {
-      return db.addTrace(moduleId, stepId, type, completed);
-    })
-    .then(self.traceCallback.bind(self) || function () {})
-    .catch(function (err) {
-      console.debug(err);
-    });
+  this.monitor.recordTrace(new Trace(moduleId, stepId, type, completed));
 };
 
 document.registerElement('app-palef', { prototype: appPrototype });

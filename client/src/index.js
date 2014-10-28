@@ -7,11 +7,18 @@ var app = document.createElement('app-palef');
 var db = require('./database');
 var http = require('./http');
 var Syncer = require('./syncer');
+var Monitor = require('./monitor');
 var Router = require('./router');
 var router = new Router();
 var syncer = new Syncer(db, http, true);
+var monitor = new Monitor(syncer);
 
-app.traceCallback = syncer.syncAll.bind(syncer);
+// no
+app.traceCallback = syncer.syncTrace.bind(syncer);
+
+
+app.setMonitor(monitor);
+
 
 // tmp: no op
 syncer.syncedCallback = function (progress) {};

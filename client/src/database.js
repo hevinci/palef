@@ -1,5 +1,6 @@
 require('es6-promise').polyfill();
 
+var Trace = require('./trace');
 var db = module.exports = {};
 var connection = null;
 
@@ -58,15 +59,13 @@ db.destroy = function (name) {
   });
 };
 
-db.addTrace = function (module, step, type, complete) {
+db.addTrace = function (trace) {
+  if (!(trace instanceof Trace)) {
+    return Promise.reject(TypeError('Argument must be of type "Trace"'));
+  }
+
   return writeTransaction('traces', function (store) {
-    store.add({
-      module: module,
-      step: step,
-      type: type,
-      complete: complete,
-      time: Date.now()
-    });
+    store.add(trace);
   });
 };
 
