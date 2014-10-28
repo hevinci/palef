@@ -96,6 +96,18 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
     return quiz;
   }
 
+  if (step.type === 'video') {
+    self._saveTrace(moduleId, stepId, 'text', true);
+    var video = document.createElement('video');
+    var source = document.createElement('source');
+    video.controls = true;
+    source.src = step.data.url;
+    source.type = step.data.type;
+    video.appendChild(source);
+
+    return video;
+  }
+
   throw new Error('Unknown step type "' + step.type + '"');
 };
 
