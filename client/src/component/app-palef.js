@@ -97,7 +97,7 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
   }
 
   if (step.type === 'video') {
-    self._saveTrace(moduleId, stepId, 'text', true);
+    self._saveTrace(moduleId, stepId, 'video', true);
     var video = document.createElement('video');
     var source = document.createElement('source');
     video.controls = true;
