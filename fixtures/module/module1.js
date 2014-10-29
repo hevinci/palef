@@ -11,6 +11,13 @@ module.exports = {
       data: 'This is some text for step 2...'
     },
     {
+      type: 'video',
+      data: {
+        url: 'video/sample.mp4',
+        type: 'video/mp4'
+      }
+    },
+    {
       type: 'quiz-choice',
       data: {
         challenge: {

@@ -1,5 +1,5 @@
 var assert = require('assert');
-var helpers = require('./../src/test_helpers');
+var helpers = require('./../src/test-helpers');
 var http = require('./../src/http');
 
 describe('http', function () {

@@ -1,9 +1,11 @@
-var controlsPrototype = Object.create(HTMLElement.prototype);
+var basePrototype = require('./base-prototype');
+var controlsPrototype = Object.create(basePrototype);
 
 controlsPrototype.createdCallback = function () {
-  this.previousStep = null;
-  this.nextStep = null;
-  this._build();
+  this.buildFromTemplate('module-controls');
+  var controls = this.querySelectorAll('a');
+  this.previousStep = controls[0];
+  this.nextStep = controls[1];
 };
 
 controlsPrototype.showControls = function (state) {
@@ -14,22 +16,6 @@ controlsPrototype.showControls = function (state) {
 
 controlsPrototype.hide = function () {
   this.className = 'invisible';
-};
-
-controlsPrototype._build = function () {
-  var leftIcon = document.createElement('span');
-  var rightIcon = document.createElement('span');
-
-  this.previousStep = document.createElement('a');
-  this.nextStep = document.createElement('a');
-
-  leftIcon.className = 'icon-arrow-left';
-  rightIcon.className = 'icon-arrow-right';
-
-  this.previousStep.appendChild(leftIcon);
-  this.nextStep.appendChild(rightIcon);
-  this.appendChild(this.previousStep);
-  this.appendChild(this.nextStep);
 };
 
 controlsPrototype._updateControl = function (control, moduleId, nextState) {

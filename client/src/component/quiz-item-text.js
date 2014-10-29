@@ -1,12 +1,14 @@
-var itemPrototype = Object.create(HTMLElement.prototype);
+var basePrototype = require('./base-prototype');
+var itemPrototype = Object.create(basePrototype);
 
 itemPrototype.createdCallback = function () {
+  this.buildFromTemplate('quiz-item-text');
   this.uid = null;
   this.type = 'single';
-  this.input = null;
-  this.label = null;
-  this.text = null;
-  this._build();
+  this.label = this.querySelector('label');
+  this.text = this.querySelector('span');
+  this.input = this.querySelector('input');
+  this.input.onclick = this._onSelected.bind(this);
 };
 
 itemPrototype.selectedCallback = null;
@@ -18,23 +20,11 @@ itemPrototype.setData = function (data) {
   this._bind(data);
 };
 
-itemPrototype._build = function () {
-  this.input = document.createElement('input');
-  this.label = document.createElement('label');
-  this.text = document.createTextNode('');
-  this.input.onclick = this._onSelected.bind(this);
-  var span = document.createElement('span');
-  span.appendChild(this.text);
-  this.label.appendChild(this.input);
-  this.label.appendChild(span);
-  this.appendChild(this.label);
-};
-
 itemPrototype._bind = function (data) {
   this.input.id = this.quizUid + '-' + this.uid;
   this.input.type = this.type === 'single' ? 'radio' : 'checkbox';
   this.input.name = 'quiz-' + this.quizUid;
-  this.text.data = data.text;
+  this.text.textContent = data.text;
   this.label.htmlFor = this.input.id;
 };
 

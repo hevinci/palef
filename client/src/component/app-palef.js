@@ -1,8 +1,8 @@
-require('./nav_bar');
-require('./module_list');
-require('./module_status');
-require('./module_controls');
-require('./quiz_choice');
+require('./nav-bar');
+require('./module-list');
+require('./module-status');
+require('./module-controls');
+require('./quiz-choice');
 
 var db = require('./../database');
 
@@ -94,6 +94,18 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
       self._saveTrace(moduleId, stepId, 'quiz-choice', score);
     };
     return quiz;
+  }
+
+  if (step.type === 'video') {
+    self._saveTrace(moduleId, stepId, 'video', true);
+    var video = document.createElement('video');
+    var source = document.createElement('source');
+    video.controls = true;
+    source.src = step.data.url;
+    source.type = step.data.type;
+    video.appendChild(source);
+
+    return video;
   }
 
   throw new Error('Unknown step type "' + step.type + '"');

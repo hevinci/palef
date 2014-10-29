@@ -1,16 +1,18 @@
-require('./quiz_item_text');
+require('./quiz-item-text');
 
-var quizPrototype = Object.create(HTMLElement.prototype);
+var basePrototype = require('./base-prototype');
+var quizPrototype = Object.create(basePrototype);
 
 quizPrototype.createdCallback = function () {
+  this.buildFromTemplate('quiz-choice');
   this.uid = null;
   this.type = 'single';
   this.chosenItemUids = [];
-  this.titleBox = null;
-  this.itemContainer = null;
-  this.button = null;
+  this.titleBox = this.querySelector('h3');
+  this.itemContainer = this.querySelector('ul');
+  this.button = this.querySelector('button');
+  this.button.onclick = this._onValidate.bind(this);
   this.isBound = false;
-  this._build();
 };
 
 quizPrototype.validatedCallback = null;
@@ -31,19 +33,6 @@ quizPrototype.computeScore = function (answers) {
   });
 
   return score;
-};
-
-quizPrototype._build = function () {
-  this.titleBox = document.createElement('h3');
-  this.itemContainer = document.createElement('ul');
-  this.button = document.createElement('button');
-  this.itemContainer.className = 'choices';
-  this.button.disabled = true;
-  this.button.onclick = this._onValidate.bind(this);
-  this.button.appendChild(document.createTextNode('Validate'));
-  this.appendChild(this.titleBox);
-  this.appendChild(this.itemContainer);
-  this.appendChild(this.button);
 };
 
 quizPrototype._bind = function (title, items) {

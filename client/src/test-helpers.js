@@ -38,7 +38,7 @@ helpers.click = function (selector) {
     try {
       var element = helpers.select(selector);
     } catch (error) {
-      reject(error);
+      return reject(error);
     }
 
     var event = document.createEvent('MouseEvents');
@@ -57,7 +57,7 @@ helpers.createEvent = function (name) {
   event.initEvent(name, true, true);
 
   return event;
-}
+};
 
 helpers.assertElement = function (element, shouldBeFilled) {
   assert.ok(element instanceof HTMLElement);
