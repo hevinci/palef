@@ -26,13 +26,10 @@ routes.traces = function (req, res, next) {
                   if (stats.modules[i].id == trace.module) {
                     for (var j = 0; j < stats.modules[i].steps.length; ++j) {
                       if (stats.modules[i].steps[j].id == trace.step) {
-                        stats.modules[i].steps[j].complete = true;
-                        stats.modules[i].steps[j].score = trace.score || null;
-
+                        stats.modules[i].steps[j].score = trace.score;
                         break;
                       }
                     }
-
                     break;
                   }
                 }

@@ -25,7 +25,7 @@
         <td>{{= value.module }}</td>
         <td>{{= value.step }}</td>
         <td>{{= value.type }}</td>
-        <td>{{? value.score }}{{= value.score }}{{??}}-{{?}}</td>
+        <td>{{? value.score !== null }}{{= value.score }}{{??}}-{{?}}</td>
         <td>{{= value.time }}</td>
       </tr>
       {{~}}

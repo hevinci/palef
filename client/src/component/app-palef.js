@@ -11,7 +11,6 @@ appPrototype.createdCallback = function () {
   // tmp
   this.monitor = null;
 
-  this.modules = [];
   this.navBar = null;
   this.moduleStatus = null;
   this.moduleControls = null;
@@ -29,11 +28,6 @@ appPrototype.setMonitor = function (monitor) {
   this.monitor = monitor;
 };
 
-// tmp
-appPrototype.setModules = function (modules) {
-  this.modules = modules;
-};
-
 appPrototype.listModules = function () {
   this.moduleControls.hide();
   this.moduleList.setModules(this.modules);
@@ -42,24 +36,24 @@ appPrototype.listModules = function () {
 };
 
 appPrototype.displayStep = function (moduleId, stepId) {
-  var stepData = this.modules[moduleId - 1].steps[stepId - 1];
-  var stepCount = this.modules[moduleId - 1].steps.length;
+  var step = this.monitor.getStep(moduleId, stepId);
+  var moduleInfo = this.monitor.getModuleInfo(moduleId);
 
   this.moduleStatus.showStatus({
-    moduleTitle: this.modules[moduleId - 1].title,
-    currentStep: stepId,
-    stepCount: this.modules[moduleId - 1].steps.length
+    moduleTitle: moduleInfo.title,
+    stepCount: moduleInfo.stepCount,
+    currentStep: stepId
 
   });
   this.moduleControls.showControls({
     moduleId: moduleId,
-    previousStep: stepId > 1 ? stepId - 1 : false,
-    nextStep: stepCount > stepId ? stepId + 1 : false
+    previousStep: this.monitor.previousStepId(moduleId, stepId),
+    nextStep: this.monitor.nextStepId(moduleId, stepId)
   });
 
   this.navBar.displayCenter(this.moduleStatus);
   this.navBar.displayRight(this.moduleControls);
-  this._switchTo(this._resolveStep(stepData, moduleId, stepId));
+  this._switchTo(this._resolveStep(step, moduleId, stepId));
 };
 
 appPrototype._build = function () {

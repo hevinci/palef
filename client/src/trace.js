@@ -13,7 +13,7 @@ function Trace(module, step, type, score) {
   this.module = passCheck(module, 'module', 'number');
   this.step = passCheck(step, 'step', 'number');
   this.type = passCheck(type, 'type', 'string');
-  this.score = passCheck(score, 'score', 'number', true) || null;
+  this.score = passCheck(score, 'score', 'number', true);
   this.time = Date.now();
 }
 
@@ -28,8 +28,12 @@ function passCheck(argument, name, type, isNullable) {
     if (argument === '' || argument === null) {
       throw new Error('Argument "' + name + '" cannot be empty');
     }
-  } else if (!isNullable) {
-    throw new Error('Argument "' + name + '" must be defined');
+  } else {
+    if (!isNullable) {
+      throw new Error('Argument "' + name + '" must be defined');
+    }
+
+    return null;
   }
 
   return argument;
