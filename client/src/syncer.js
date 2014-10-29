@@ -71,6 +71,7 @@ Syncer.prototype.syncTrace = function (trace) {
     .then(self.db.open)
     .then(self._getCachedProgress.bind(self))
     .then(self.db.updateProgress)
+    .then(self._getCachedProgress.bind(self))
     .then(function (progress) {
       self.log('Trace sent');
       self.isLocked = false;
@@ -145,6 +146,7 @@ Syncer.prototype._doSyncAll = function (isScheduled) {
     .then(self.db.removeTraces)
     .then(self._getCachedProgress.bind(self))
     .then(self.db.updateProgress)
+    .then(self._getCachedProgress.bind(self))
     .then(self.syncedCallback)
     .then(self._onSyncAllSuccess.bind(self))
     .catch(self._onSyncAllError.bind(self));

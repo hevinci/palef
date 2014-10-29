@@ -29,10 +29,19 @@ appPrototype.setMonitor = function (monitor) {
 };
 
 appPrototype.listModules = function () {
-  this.moduleControls.hide();
-  this.moduleList.setModules(this.modules);
-  this.navBar.displayCenter(this.defaultTitle);
-  this._switchTo(this.moduleList);
+  var self = this;
+
+  self.monitor.getModuleList()
+    .then(self.moduleList.setModules.bind(self.moduleList))
+    .then(function () {
+      self.moduleControls.hide();
+      self.navBar.displayCenter(self.defaultTitle);
+      self._switchTo(self.moduleList);
+    })
+    .catch(function (error) {
+      console.error(error);
+      throw error;
+    });
 };
 
 appPrototype.displayStep = function (moduleId, stepId) {
@@ -47,8 +56,8 @@ appPrototype.displayStep = function (moduleId, stepId) {
   });
   this.moduleControls.showControls({
     moduleId: moduleId,
-    previousStep: this.monitor.previousStepId(moduleId, stepId),
-    nextStep: this.monitor.nextStepId(moduleId, stepId)
+    previousStep: this.monitor.getPreviousStepId(moduleId, stepId),
+    nextStep: this.monitor.getNextStepId(moduleId, stepId)
   });
 
   this.navBar.displayCenter(this.moduleStatus);
@@ -85,7 +94,7 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
   switch (step.type) {
     case 'text':
       view = document.createTextNode(step.data);
-      trace = new Trace(moduleId, stepId, 'text');
+      trace = new Trace(moduleId, stepId, 'text', true);
       break;
     case 'video':
       var video = document.createElement('video');
@@ -95,7 +104,7 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
       source.type = step.data.type;
       video.appendChild(source);
       view = video;
-      trace = new Trace(moduleId, stepId, 'video');
+      trace = new Trace(moduleId, stepId, 'video', true);
       break;
     case 'quiz-choice':
       view = document.createElement('quiz-choice');
@@ -103,17 +112,16 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
       view.validatedCallback = function () {
         var score = view.computeScore(step.data.solutions);
         self.monitor.recordTrace(
-          new Trace(moduleId, stepId, 'quiz-choice', score)
+          new Trace(moduleId, stepId, 'quiz-choice', true, score)
         );
       };
+      trace = new Trace(moduleId, stepId, 'quiz-choice', false);
       break;
     default:
       throw new Error('Unknown step type "' + step.type + '"');
   }
 
-  if (trace) {
-    this.monitor.recordTrace(trace);
-  }
+  this.monitor.recordTrace(trace);
 
   return view;
 };

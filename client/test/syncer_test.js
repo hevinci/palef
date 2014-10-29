@@ -6,7 +6,7 @@ var Trace = require('./../src/trace');
 var Syncer = require('./../src/syncer');
 
 // "waiting time" after sync calls: increase this value on slow systems
-var delay = 10;
+var delay = 20;
 
 describe('syncer', function () {
   var syncer, singleTrace, dbTraces, progress;
@@ -20,7 +20,7 @@ describe('syncer', function () {
     http.sendTraces = sinon.stub();
     syncer = new Syncer(db, http);
     syncer.syncedCallback = sinon.spy();
-    singleTrace = new Trace(1, 2, 'quiz', 14);
+    singleTrace = new Trace(1, 2, 'quiz', true, 14);
     dbTraces = [
       { key: 1, value: 'tr 1' },
       { key: 2, value: 'tr 2' },

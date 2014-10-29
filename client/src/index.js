@@ -11,18 +11,16 @@ var Monitor = require('./monitor');
 var Router = require('./router');
 var router = new Router();
 var syncer = new Syncer(db, http, true);
-
-var modules = [
+var monitor = new Monitor(syncer, db, [
   require('./../../fixtures/module/module1'),
   require('./../../fixtures/module/module2'),
   require('./../../fixtures/module/module3'),
   require('./../../fixtures/module/module4')
-];
+]);
 
-// tmp: no op
-syncer.syncedCallback = function (progress) {};
+syncer.syncedCallback = monitor.onServerProgress.bind(monitor);
 app.traceCallback = syncer.syncTrace.bind(syncer);
-app.setMonitor(new Monitor(syncer, db, modules));
+app.setMonitor(monitor);
 document.body.appendChild(app);
 
 router.add(/^#modules\/*$/, function () {

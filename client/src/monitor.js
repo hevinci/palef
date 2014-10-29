@@ -1,20 +1,37 @@
+Trace = require('./trace');
+
 module.exports = Monitor;
 
 function Monitor(syncer, db, modules) {
   this.syncer = syncer;
   this.db = db;
   this.modules = modules;
+  this.cachedStats = null;
 }
 
-Monitor.prototype.recordTrace = function (trace) {
-  return this.syncer.syncTrace(trace);
+Monitor.prototype.onServerProgress = function (progress) {
+  if (!progress) {
+    // cannot throw... (called inside syncer promise)
+    console.error('Did not receive progress from server');
+  } else {
+    this.cachedStats = progress.modules;
+  }
 };
 
-Monitor.prototype.getStep = function (moduleId, stepId) {
-  var module = this._findModule(moduleId);
-  var stepIndex = this._getStepIndex(module, stepId);
+Monitor.prototype.getModuleList = function () {
+  var self = this;
 
-  return module.steps[stepIndex];
+  if (!this.cachedStats) {
+    return self.db.open()
+      .then(self.db.getProgress)
+      .then(function (progress) {
+        return self.cachedStats = progress ?
+          progress.modules :
+          self._buildEmptyModuleStats();
+      });
+  }
+
+  return Promise.resolve(self.cachedStats);
 };
 
 Monitor.prototype.getModuleInfo = function (moduleId) {
@@ -26,20 +43,49 @@ Monitor.prototype.getModuleInfo = function (moduleId) {
   }
 };
 
-Monitor.prototype.previousStepId = function (moduleId, currentStepId) {
+Monitor.prototype.getStep = function (moduleId, stepId) {
+  var module = this._findModule(moduleId);
+  var stepIndex = this._getStepIndex(module, stepId);
+
+  return module.steps[stepIndex];
+};
+
+Monitor.prototype.getPreviousStepId = function (moduleId, currentStepId) {
   return this._findCloseStep(moduleId, currentStepId, true);
 };
 
-Monitor.prototype.nextStepId = function (moduleId, currentStepId) {
+Monitor.prototype.getNextStepId = function (moduleId, currentStepId) {
   return this._findCloseStep(moduleId, currentStepId, false);
 };
 
-Monitor.prototype.getProgress = function (moduleId) {
+Monitor.prototype.recordTrace = function (trace) {
+  if (!(trace instanceof Trace)) {
+    throw new TypeError('Argument must be of type "Trace"');
+  }
 
+  return this.syncer.syncTrace(trace);
 };
 
-Monitor.prototype.computeProgress = function (newTrace) {
+Monitor.prototype._buildEmptyModuleStats = function () {
+  var stats = [];
 
+  this.modules.forEach(function (module) {
+    stats.push({
+      id: module.id,
+      title: module.title,
+      stepCount: module.steps.length,
+      completedSteps: 0,
+      steps: module.steps.map(function (step) {
+        return {
+          id: step.id,
+          complete: false,
+          score: null
+        };
+      })
+    });
+  }, this);
+
+  return stats;
 };
 
 Monitor.prototype._findCloseStep = function (moduleId, stepId, isBefore) {

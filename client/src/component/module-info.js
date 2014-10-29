@@ -8,7 +8,8 @@ infoPrototype.createdCallback = function () {
 
 infoPrototype.setData = function (data) {
   this.anchor.href = '#modules/' + data.id;
-  this.anchor.textContent = data.title;
+  this.anchor.textContent = data.title +
+    ' (' + data.completedSteps + '/' + data.stepCount + ')';
 };
 
 document.registerElement('module-info', { prototype: infoPrototype });

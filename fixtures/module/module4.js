@@ -3,6 +3,7 @@ module.exports = {
   title: 'Module 4',
   steps: [
     {
+      id: 1,
       type: 'text',
       data: 'Only one step here...'
     }

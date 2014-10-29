@@ -6,13 +6,15 @@ module.exports = Trace;
  * @param {number}  module    The module id
  * @param {number}  step      The step id
  * @param {string}  type      The step type
+ * @param {boolean} complete  Whether the step is complete
  * @param {number}  [score]   The step score
  * @constructor
  */
-function Trace(module, step, type, score) {
+function Trace(module, step, type, complete, score) {
   this.module = passCheck(module, 'module', 'number');
   this.step = passCheck(step, 'step', 'number');
   this.type = passCheck(type, 'type', 'string');
+  this.complete = passCheck(complete, 'complete', 'boolean');
   this.score = passCheck(score, 'score', 'number', true);
   this.time = Date.now();
 }
