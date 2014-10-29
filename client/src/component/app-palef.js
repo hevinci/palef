@@ -103,7 +103,7 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
       view.validatedCallback = function () {
         var score = view.computeScore(step.data.solutions);
         self.monitor.recordTrace(
-          new Trace (moduleId, stepId, 'quiz-choice', score)
+          new Trace(moduleId, stepId, 'quiz-choice', score)
         );
       };
       break;
@@ -116,10 +116,6 @@ appPrototype._resolveStep = function (step, moduleId, stepId) {
   }
 
   return view;
-};
-
-appPrototype._saveTrace = function (moduleId, stepId, type, score) {
-  this.monitor.recordTrace(new Trace(moduleId, stepId, type, score));
 };
 
 document.registerElement('app-palef', { prototype: appPrototype });
