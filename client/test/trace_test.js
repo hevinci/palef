@@ -15,6 +15,11 @@ describe('trace', function () {
     assert.strictEqual(trace.score, 21);
   });
 
+  it('makes the score attribute null if not provided', function () {
+    var trace = new Trace(1, 1, 'video');
+    assert.strictEqual(null, trace.score);
+  });
+
   it('throws an error if data is missing', function () {
     assert.throws(function () { new Trace() });
     assert.throws(function () { new Trace(1) });

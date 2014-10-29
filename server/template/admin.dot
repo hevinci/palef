@@ -14,17 +14,19 @@
       <tr>
         <th>Module</th>
         <th>Step</th>
-        <th>Complete</th>
+        <th>Type</th>
+        <th>Score</th>
         <th>Time</th>
       </tr>
     </thead>
     <tbody>
       {{~ it.traces :value:index }}
       <tr>
-        <td>{{=value.module }}</td>
-        <td>{{=value.step }}</td>
-        <td>{{=value.complete }}</td>
-        <td>{{=value.time }}</td>
+        <td>{{= value.module }}</td>
+        <td>{{= value.step }}</td>
+        <td>{{= value.type }}</td>
+        <td>{{? value.score }}{{= value.score }}{{??}}-{{?}}</td>
+        <td>{{= value.time }}</td>
       </tr>
       {{~}}
     </tbody>

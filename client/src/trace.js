@@ -13,7 +13,7 @@ function Trace(module, step, type, score) {
   this.module = passCheck(module, 'module', 'number');
   this.step = passCheck(step, 'step', 'number');
   this.type = passCheck(type, 'type', 'string');
-  this.score = passCheck(score, 'score', 'number', true);
+  this.score = passCheck(score, 'score', 'number', true) || null;
   this.time = Date.now();
 }
 

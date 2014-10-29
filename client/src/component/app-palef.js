@@ -86,41 +86,46 @@ appPrototype._switchTo = function (element) {
 };
 
 appPrototype._resolveStep = function (step, moduleId, stepId) {
-  var self = this;
+  var self = this, view, trace;
 
-  if (step.type === 'text') {
-    self._saveTrace(moduleId, stepId, 'text', true);
-
-    return document.createTextNode(step.data);
+  switch (step.type) {
+    case 'text':
+      view = document.createTextNode(step.data);
+      trace = new Trace(moduleId, stepId, 'text');
+      break;
+    case 'video':
+      var video = document.createElement('video');
+      var source = document.createElement('source');
+      video.controls = true;
+      source.src = step.data.url;
+      source.type = step.data.type;
+      video.appendChild(source);
+      view = video;
+      trace = new Trace(moduleId, stepId, 'video');
+      break;
+    case 'quiz-choice':
+      view = document.createElement('quiz-choice');
+      view.setChallenge(step.data.challenge);
+      view.validatedCallback = function () {
+        var score = view.computeScore(step.data.solutions);
+        self.monitor.recordTrace(
+          new Trace (moduleId, stepId, 'quiz-choice', score)
+        );
+      };
+      break;
+    default:
+      throw new Error('Unknown step type "' + step.type + '"');
   }
 
-  if (step.type === 'quiz-choice') {
-    var quiz = document.createElement('quiz-choice');
-    quiz.setChallenge(step.data.challenge);
-    quiz.validatedCallback = function () {
-      var score = quiz.computeScore(step.data.solutions);
-      self._saveTrace(moduleId, stepId, 'quiz-choice', score);
-    };
-    return quiz;
+  if (trace) {
+    this.monitor.recordTrace(trace);
   }
 
-  if (step.type === 'video') {
-    self._saveTrace(moduleId, stepId, 'video', true);
-    var video = document.createElement('video');
-    var source = document.createElement('source');
-    video.controls = true;
-    source.src = step.data.url;
-    source.type = step.data.type;
-    video.appendChild(source);
-
-    return video;
-  }
-
-  throw new Error('Unknown step type "' + step.type + '"');
+  return view;
 };
 
-appPrototype._saveTrace = function (moduleId, stepId, type, completed) {
-  this.monitor.recordTrace(new Trace(moduleId, stepId, type, completed));
+appPrototype._saveTrace = function (moduleId, stepId, type, score) {
+  this.monitor.recordTrace(new Trace(moduleId, stepId, type, score));
 };
 
 document.registerElement('app-palef', { prototype: appPrototype });
