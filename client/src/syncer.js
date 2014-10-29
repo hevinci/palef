@@ -20,7 +20,7 @@ function Syncer(db, http, debug) {
   this.cachedTraceValues = null;
   this.cachedProgress = null;
   this.log = debug ?
-    console.debug.bind(console) :
+    (console.debug || console.log).bind(console) :
     function () {};
 }
 
