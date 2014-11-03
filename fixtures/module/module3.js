@@ -3,18 +3,22 @@ module.exports = {
   title: 'Module 3',
   steps: [
     {
+      id: 1,
       type: 'text',
       data: 'This is some text for step 1...'
     },
     {
+      id: 2,
       type: 'text',
       data: 'This is some text for step 2...'
     },
     {
+      id: 3,
       type: 'text',
       data: 'This is some text for step 3...'
     },
     {
+      id: 4,
       type: 'quiz-choice',
       data: {
         challenge: {

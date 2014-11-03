@@ -1,5 +1,6 @@
 require('es6-promise').polyfill();
 
+var Trace = require('./trace');
 var db = module.exports = {};
 var connection = null;
 
@@ -46,56 +47,28 @@ db.destroy = function (name) {
       resolve();
     };
     request.onerror = function (event) {
-      reject(Error(
-          'Error while deleting db: ' + event.target.errorCode
-      ));
+      reject(Error('Error while deleting db: ' + event.target.errorCode));
     };
     request.onblocked = function () {
       reject(Error(
-          'Cannot destroy db "' + name + '": request has been blocked'
+        'Cannot destroy db "' + name + '": request has been blocked'
       ));
     };
   });
 };
 
-db.addTrace = function (module, step, type, complete) {
+db.addTrace = function (trace) {
+  if (!(trace instanceof Trace)) {
+    return Promise.reject(TypeError('Argument must be of type "Trace"'));
+  }
+
   return writeTransaction('traces', function (store) {
-    store.add({
-      module: module,
-      step: step,
-      type: type,
-      complete: complete,
-      time: Date.now()
-    });
+    store.add(trace);
   });
 };
 
 db.getTraces = function () {
-  return new Promise(function (resolve, reject) {
-    var transaction, store, request;
-    var traces = [];
-
-    if (!connection) {
-      return reject(Error('Database is not opened'));
-    }
-
-    transaction = connection.transaction('traces', 'readonly');
-    store = transaction.objectStore('traces');
-    request = store.openCursor();
-    request.onsuccess = function () {
-      var cursor = request.result;
-
-      if (cursor) {
-        traces.push({
-          key: cursor.key,
-          value: cursor.value
-        });
-        cursor.continue();
-      } else {
-        resolve(traces);
-      }
-    };
-  });
+  return readAllTransaction('traces');
 };
 
 db.removeTraces = function (keys) {
@@ -108,6 +81,17 @@ db.removeTraces = function (keys) {
       store.delete(key);
     });
   });
+};
+
+db.getProgress = function () {
+  return readAllTransaction('stats')
+    .then(function (stats) {
+      if (stats && stats[0]) {
+        return stats[0].value;
+      }
+
+      return null;
+    });
 };
 
 db.updateProgress = function (progress) {
@@ -129,6 +113,40 @@ function writeTransaction(storeName, operation) {
     operation(store);
     transaction.oncomplete = function () {
       resolve();
+    };
+    transaction.onabort = function () {
+      reject(this.error);
+    };
+    transaction.onerror = function () {
+      reject(this.error);
+    };
+  });
+}
+
+function readAllTransaction(storeName) {
+  return new Promise(function (resolve, reject) {
+    var transaction, store, request;
+    var records = [];
+
+    if (!connection) {
+      return reject(Error('Database is not opened'));
+    }
+
+    transaction = connection.transaction(storeName, 'readonly');
+    store = transaction.objectStore(storeName);
+    request = store.openCursor();
+    request.onsuccess = function () {
+      var cursor = request.result;
+
+      if (cursor) {
+        records.push({
+          key: cursor.key,
+          value: cursor.value
+        });
+        cursor.continue();
+      } else {
+        resolve(records);
+      }
     };
     transaction.onabort = function () {
       reject(this.error);

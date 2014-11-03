@@ -4,12 +4,13 @@ require('./module-status');
 require('./module-controls');
 require('./quiz-choice');
 
-var db = require('./../database');
-
+var Trace = require('./../trace');
 var appPrototype = Object.create(HTMLElement.prototype);
 
 appPrototype.createdCallback = function () {
-  this.modules = [];
+  // tmp
+  this.monitor = null;
+
   this.navBar = null;
   this.moduleStatus = null;
   this.moduleControls = null;
@@ -22,36 +23,46 @@ appPrototype.createdCallback = function () {
 
 appPrototype.traceCallback = null;
 
-appPrototype.setModules = function (modules) {
-  this.modules = modules;
+// tmp
+appPrototype.setMonitor = function (monitor) {
+  this.monitor = monitor;
 };
 
 appPrototype.listModules = function () {
-  this.moduleControls.hide();
-  this.moduleList.setModules(this.modules);
-  this.navBar.displayCenter(this.defaultTitle);
-  this._switchTo(this.moduleList);
+  var self = this;
+
+  self.monitor.getModuleList()
+    .then(self.moduleList.setModules.bind(self.moduleList))
+    .then(function () {
+      self.moduleControls.hide();
+      self.navBar.displayCenter(self.defaultTitle);
+      self._switchTo(self.moduleList);
+    })
+    .catch(function (error) {
+      console.error(error);
+      throw error;
+    });
 };
 
 appPrototype.displayStep = function (moduleId, stepId) {
-  var stepData = this.modules[moduleId - 1].steps[stepId - 1];
-  var stepCount = this.modules[moduleId - 1].steps.length;
+  var step = this.monitor.getStep(moduleId, stepId);
+  var moduleInfo = this.monitor.getModuleInfo(moduleId);
 
   this.moduleStatus.showStatus({
-    moduleTitle: this.modules[moduleId - 1].title,
-    currentStep: stepId,
-    stepCount: this.modules[moduleId - 1].steps.length
+    moduleTitle: moduleInfo.title,
+    stepCount: moduleInfo.stepCount,
+    currentStep: stepId
 
   });
   this.moduleControls.showControls({
     moduleId: moduleId,
-    previousStep: stepId > 1 ? stepId - 1 : false,
-    nextStep: stepCount > stepId ? stepId + 1 : false
+    previousStep: this.monitor.getPreviousStepId(moduleId, stepId),
+    nextStep: this.monitor.getNextStepId(moduleId, stepId)
   });
 
   this.navBar.displayCenter(this.moduleStatus);
   this.navBar.displayRight(this.moduleControls);
-  this._switchTo(this._resolveStep(stepData, moduleId, stepId));
+  this._switchTo(this._resolveStep(step, moduleId, stepId));
 };
 
 appPrototype._build = function () {
@@ -78,50 +89,41 @@ appPrototype._switchTo = function (element) {
 };
 
 appPrototype._resolveStep = function (step, moduleId, stepId) {
-  var self = this;
+  var self = this, view, trace;
 
-  if (step.type === 'text') {
-    self._saveTrace(moduleId, stepId, 'text', true);
-
-    return document.createTextNode(step.data);
+  switch (step.type) {
+    case 'text':
+      view = document.createTextNode(step.data);
+      trace = new Trace(moduleId, stepId, 'text', true);
+      break;
+    case 'video':
+      var video = document.createElement('video');
+      var source = document.createElement('source');
+      video.controls = true;
+      source.src = step.data.url;
+      source.type = step.data.type;
+      video.appendChild(source);
+      view = video;
+      trace = new Trace(moduleId, stepId, 'video', true);
+      break;
+    case 'quiz-choice':
+      view = document.createElement('quiz-choice');
+      view.setChallenge(step.data.challenge);
+      view.validatedCallback = function () {
+        var score = view.computeScore(step.data.solutions);
+        self.monitor.recordTrace(
+          new Trace(moduleId, stepId, 'quiz-choice', true, score)
+        );
+      };
+      trace = new Trace(moduleId, stepId, 'quiz-choice', false);
+      break;
+    default:
+      throw new Error('Unknown step type "' + step.type + '"');
   }
 
-  if (step.type === 'quiz-choice') {
-    var quiz = document.createElement('quiz-choice');
-    quiz.setChallenge(step.data.challenge);
-    quiz.validatedCallback = function () {
-      var score = quiz.computeScore(step.data.solutions);
-      self._saveTrace(moduleId, stepId, 'quiz-choice', score);
-    };
-    return quiz;
-  }
+  this.monitor.recordTrace(trace);
 
-  if (step.type === 'video') {
-    self._saveTrace(moduleId, stepId, 'video', true);
-    var video = document.createElement('video');
-    var source = document.createElement('source');
-    video.controls = true;
-    source.src = step.data.url;
-    source.type = step.data.type;
-    video.appendChild(source);
-
-    return video;
-  }
-
-  throw new Error('Unknown step type "' + step.type + '"');
-};
-
-appPrototype._saveTrace = function (moduleId, stepId, type, completed) {
-  var self = this;
-
-  db.open()
-    .then(function () {
-      return db.addTrace(moduleId, stepId, type, completed);
-    })
-    .then(self.traceCallback.bind(self) || function () {})
-    .catch(function (err) {
-      console.debug(err);
-    });
+  return view;
 };
 
 document.registerElement('app-palef', { prototype: appPrototype });

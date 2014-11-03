@@ -3,14 +3,17 @@ module.exports = {
   title: 'Module 1',
   steps: [
     {
+      id: 1,
       type: 'text',
       data: 'This is some text for step 1...'
     },
     {
+      id: 2,
       type: 'text',
       data: 'This is some text for step 2...'
     },
     {
+      id: 3,
       type: 'video',
       data: {
         url: 'video/sample.mp4',
@@ -18,6 +21,7 @@ module.exports = {
       }
     },
     {
+      id: 4,
       type: 'quiz-choice',
       data: {
         challenge: {
@@ -38,6 +42,7 @@ module.exports = {
       }
     },
     {
+      id: 5,
       type: 'quiz-choice',
       data: {
         type: "choice",

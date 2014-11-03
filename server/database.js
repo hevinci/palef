@@ -81,9 +81,12 @@ function loadModuleStats() {
     modules.forEach(function (module) {
       moduleStats.push({
         id: module.id,
-        steps: module.steps.map(function (step, index) {
+        title: module.title,
+        stepCount: module.steps.length,
+        completedSteps: 0,
+        steps: module.steps.map(function (step) {
           return {
-            id: index,
+            id: step.id,
             complete: false,
             score: null
           };
@@ -96,7 +99,7 @@ function loadModuleStats() {
         return reject(Error(error));
       }
 
-      collection.insert({ modules: moduleStats}, function (error) {
+      collection.insert({ modules: moduleStats }, function (error) {
         if (error) {
           return reject(Error(error));
         }

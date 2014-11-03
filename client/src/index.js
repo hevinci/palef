@@ -7,23 +7,20 @@ var app = document.createElement('app-palef');
 var db = require('./database');
 var http = require('./http');
 var Syncer = require('./syncer');
+var Monitor = require('./monitor');
 var Router = require('./router');
 var router = new Router();
 var syncer = new Syncer(db, http, true);
-
-app.traceCallback = syncer.syncAll.bind(syncer);
-
-// tmp: no op
-syncer.syncedCallback = function (progress) {};
-
-var modules = [
+var monitor = new Monitor(syncer, db, [
   require('./../../fixtures/module/module1'),
   require('./../../fixtures/module/module2'),
   require('./../../fixtures/module/module3'),
   require('./../../fixtures/module/module4')
-];
+]);
 
-app.setModules(modules);
+syncer.syncedCallback = monitor.onServerProgress.bind(monitor);
+app.traceCallback = syncer.syncTrace.bind(syncer);
+app.setMonitor(monitor);
 document.body.appendChild(app);
 
 router.add(/^#modules\/*$/, function () {
