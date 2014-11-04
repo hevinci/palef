@@ -1,0 +1,49 @@
+header
+  box-sizing border-box
+  position relative // sometimes needed for box-shadow
+  // cannot find workaround for animated auto height...
+  //min-height 64px
+  height 64px
+  padding $gutterSmaller
+  box-shadow 0 2px 5px rgba(0,0,0,.26)
+  transition height 0.2s ease
+  *
+    margin 0
+    padding 0
+    font-size $textLarger
+
+body.home
+  header
+    display flex
+    align-items center
+    nav
+      opacity 0
+    div.icon-user
+      display block
+      flex-shrink 0
+      margin auto $gutterSmall auto 0
+
+body.chapter, body.quiz
+  header
+    display flex
+    flex-flow row wrap
+    justify-content center
+    // cannot find workaround for animated auto height...
+    //min-height 100px
+    height 100px
+    nav
+      width 100%
+      display flex
+      justify-content space-between
+      opacity 1
+      transition opacity 0.3s ease
+      div.icon-previous, div.icon-next, div.icon-home
+        display block
+    h1
+      padding $gutterSmall
+
+body.quiz
+  header
+    height 140px
+    h1
+      font-size $textLarge

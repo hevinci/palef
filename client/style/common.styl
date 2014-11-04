@@ -1,0 +1,193 @@
+//// COLORS ////
+
+$primary = #673ab7 	// deep purple
+$hueDark = #4527a0
+$hueLight = #d1c4e9
+$hueLightest = #ede7f6
+
+$accent = #aeea00	// lime
+$accentLight = #f4ff81
+
+$accent = #18ffff       // cyan
+$accentLight = #f4ff81  // lime
+
+$white = #ffffff
+$black = #000000
+
+$whiteBgText = alpha($black, 0.87)
+$whiteBgSecondaryText = alpha($black, 0.54)
+$whiteBgHintText = alpha($black, 0.26)
+$whiteBgDivider = alpha($black, 0.12)
+
+$primaryBgText = alpha($white, 0.87)
+$primaryBgSecondaryText = alpha($white, 0.54)
+$primaryBgHintText = alpha($white, 0.26)
+$primaryBgDivider = alpha($white, 0.12)
+
+//// TEXT SIZES ////
+
+$textSmall = .86rem
+$textNormal = 1rem
+$textLarge = 1.14rem
+$textLarger = 1.43rem
+
+//// LAYOUT SIZES ////
+
+$footerHeight = 50px
+
+$gutterSmaller = .5rem
+$gutterSmall = .7rem
+$gutterNormal = 1rem
+$gutterLarge = 1.3rem
+$gutterLarger = 2rem
+
+//// GLOBAL LAYOUT ////
+
+@font-face
+  font-family "Source sans pro"
+  src url("font/sourcesanspro-light.woff")
+
+html
+  font-size 100%
+
+html, body
+  height 100%
+  margin 0
+  padding 0
+
+body
+  font-family "Source sans pro", Helvetica, Arial, Sans-Serif
+  color $whiteBgText
+  background-color $hueLightest
+
+div.wrapper
+  min-height 100%
+  margin-bottom -($footerHeight)
+
+div.wrapper:after
+  display block
+  content ""
+
+div.wrapper:after, footer
+  height $footerHeight
+
+header, footer
+  width 100%
+  background-color $primary
+  color $primaryBgText
+
+header
+  box-shadow 0 2px 5px rgba(0,0,0,.26)
+
+footer
+  box-shadow 0 -2px 5px rgba(0,0,0,.26)
+
+//// ICONS ////
+
+div[class^="icon-"], div[class*=" icon-"]
+  display none
+  width 32px
+  height 32px
+  border-radius 16px
+  div.inner
+    background-color $accentLight
+
+a.disabled div[class^="icon-"],
+a.disabled div[class*=" icon-"]
+  div.inner
+    border-color $hueDark
+
+a:not(.disabled) div[class^="icon-"]:hover,
+a:not(.disabled) div[class*=" icon-"]:hover
+  background-color $hueDark
+  cursor pointer
+  div.inner
+    background-color $accentLight
+
+div.icon-user
+  background-color $hueDark
+  div.head
+    position relative
+    top 5px
+    left 11px
+    width 10px
+    height 10px
+    border-radius 5px
+  div.chest
+    position relative
+    top 7px
+    left 7px
+    width 18px
+    height 8px
+    border-radius 6px 6px 0 0
+
+div.icon-home
+  div.inner
+    position relative
+    top 10px
+    left 8px
+    width 16px
+    height 1px
+    margin-bottom 4px
+
+div.icon-previous, div.icon-next
+  div.clip
+    position relative
+    top 6px
+    width 10px
+    height 20px
+    overflow hidden
+  div.inner
+    position relative
+    top 3px
+    box-sizing border-box
+    width 14px
+    height 14px
+    transform rotate(45deg)
+    background-color $primary
+    border solid 1px $accentLight
+
+div.icon-previous
+  div.clip
+    left 9px
+  div.inner
+    left 3px
+
+div.icon-next
+  div.clip
+    left 13px
+  div.inner
+    right 7px
+
+//// MISC ELEMENTS ////
+
+a.disabled
+  cursor default
+
+progress[value]
+  appearance none
+  -webkit-appearance none
+  border solid 1px $hueLight
+  border-radius 2px
+  height $gutterSmaller
+  line-height $gutterSmaller
+  color $accent // progress color in IE
+
+progress[value]::-webkit-progress-bar
+  background-color $white // background color in webkit
+
+progress[value]::-webkit-progress-value
+  background-color $accent // progress color in webkit
+
+progress[value]::-moz-progress-bar
+  background-color $accent // progress color in firefox
+
+//// MEDIA QUERIES ////
+
+@media all and (min-width: 600px)
+  html
+    font-size 105%
+
+@media all and (min-width: 900px)
+  html
+    font-size 110%
