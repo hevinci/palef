@@ -19,7 +19,7 @@ module.exports = function quizItem(options) {
   return item;
 };
 
-function _onSelected() {
+function _onSelected(event) {
   var isSelected = true;
 
   if (this.type !== 'single' && !event.target.checked) {
