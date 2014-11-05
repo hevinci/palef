@@ -159,6 +159,29 @@ div.icon-next
   div.inner
     right 7px
 
+div.icon-tick
+  background-color $accentLight
+  border solid 1px $hueLight
+  transition opacity .25s ease
+  div.inner
+    position relative
+    top 8px
+    left 7px
+    width 17px
+    height 10px
+    transform rotate(-45deg)
+    border solid 1px $primary
+    border-top none
+    border-right none
+    background-color transparent
+
+div.icon-tick:hover
+  cursor pointer
+  box-shadow 0 2px 5px rgba(0,0,0,.26)
+
+div.icon-tick.disabled
+  opacity 0
+
 //// MISC ELEMENTS ////
 
 a.disabled

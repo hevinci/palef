@@ -53,6 +53,7 @@ body.quiz
       display flex
       flex-flow row wrap
       box-sizing border-box
+      margin-bottom 0
       padding $gutterLarger
       list-style-type none
       li
@@ -62,10 +63,12 @@ body.quiz
           input
             flex-shrink 0
             margin-right $gutterSmall
+        label:hover
+          cursor pointer
       li + li
         margin-top $gutterSmall
-    button[disabled]
-      display none
+    div.icon-tick
+      display block
 
 @media all and (min-width: 600px)
   body.chapter

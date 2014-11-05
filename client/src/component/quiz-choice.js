@@ -10,7 +10,7 @@ function quizChoice(challenge) {
 
   quiz.innerHTML = helpers.getTemplate('quiz-choice');
   quiz.itemContainer = quiz.querySelector('ul');
-  quiz.button = quiz.querySelector('button');
+  quiz.button = quiz.querySelector('.icon-tick');
   quiz.button.onclick = _onValidate.bind(quiz);
 
   quiz.setChallenge = setChallenge.bind(quiz);
@@ -74,9 +74,9 @@ function _onItemSelected(itemUid, isSelected) {
   }
 
   if (this.chosenItemUids.length === 0) {
-    this.button.disabled = true;
+    this.button.classList.add('disabled');
   } else if (!hasAlreadyItems) {
-    this.button.disabled = false;
+    this.button.classList.remove('disabled');
   }
 }
 
