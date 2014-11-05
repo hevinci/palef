@@ -1,6 +1,6 @@
 module.exports = {
-  id: 1,
-  title: 'Module 1',
+  id: 8,
+  title: 'Module 8',
   steps: [
     {
       id: 1,
