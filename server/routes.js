@@ -27,26 +27,45 @@ routes.traces = function (req, res, next) {
           .then(db.fetchStats)
           .then(function (stats) {
             traces.forEach(function (trace) {
+              // re-compute step score and progress
               for (var i = 0; i < stats.modules.length; ++i) {
                 if (stats.modules[i].id == trace.module) {
                   stats.modules[i].stepCount = stats.modules[i].steps.length;
-                  stats.modules[i].completedSteps = 0;
 
                   for (var j = 0; j < stats.modules[i].stepCount; ++j) {
                     if (stats.modules[i].steps[j].id == trace.step) {
                       stats.modules[i].steps[j].complete =
                         stats.modules[i].steps[j].complete || trace.complete;
-                      stats.modules[i].steps[j].score = trace.score;
-                    }
 
-                    if (stats.modules[i].steps[j].complete) {
-                      stats.modules[i].completedSteps++;
+                      if (trace.score !== null) {
+                        if (trace.score > stats.modules[i].steps[j].score) {
+                          stats.modules[i].steps[j].score = trace.score;
+                        }
+                      }
                     }
                   }
                   break;
                 }
               }
             });
+
+            // re-compute module score and progress
+            for (var i = 0; i < stats.modules.length; ++i) {
+              var moduleScore = null, completedSteps = 0;
+
+              for (var j = 0; j < stats.modules[i].stepCount; ++j) {
+                if (stats.modules[i].steps[j].score !== null) {
+                  moduleScore += stats.modules[i].steps[j].score;
+                }
+
+                if (stats.modules[i].steps[j].complete) {
+                  completedSteps++;
+                }
+              }
+
+              stats.modules[i].score = moduleScore;
+              stats.modules[i].completedSteps = completedSteps;
+            }
 
             return cachedStats = stats;
           })

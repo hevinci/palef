@@ -24,7 +24,10 @@ var monitor = new Monitor(syncer, db, [
 ]);
 var app = new App(monitor);
 
-syncer.syncedCallback = monitor.onServerProgress.bind(monitor);
+syncer.syncedCallback = function (progress) {
+  monitor.onServerProgress(progress);
+  app.refreshModuleList(progress.modules);
+};
 
 router.add(/^#\/modules\/*$/, function () {
   app.displayHomepage();

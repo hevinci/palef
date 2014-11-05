@@ -23,6 +23,9 @@ function setList(modules) {
     card.querySelector('h2').textContent = module.title;
     card.querySelector('progress').value = module.completedSteps;
     card.querySelector('progress').max = module.stepCount;
+    card.querySelector('.module-score').textContent = module.score !== null ?
+      (module.score + '/' + module.max) :
+      'N/A';
     this.appendChild(card);
   }, this);
 }

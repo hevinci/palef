@@ -59,33 +59,94 @@ Monitor.prototype.getNextStepId = function (moduleId, currentStepId) {
 };
 
 Monitor.prototype.recordTrace = function (trace) {
+  var self = this;
+
   if (!(trace instanceof Trace)) {
     throw new TypeError('Argument must be of type "Trace"');
   }
 
-  return this.syncer.syncTrace(trace);
+  return self.getModuleList()
+    .then(function (modules) {
+      // re-compute stats and save them locally (needed if we're offline)
+      modules.forEach(function (module) {
+        module.score = module.max !== null ? 0 : null;
+        module.completedSteps = 0;
+
+        module.steps.forEach(function (step) {
+          if (module.id === trace.module && step.id === trace.step) {
+            step.complete = step.complete || trace.complete;
+
+            if (trace.score !== null && trace.score > step.score) {
+              step.score = trace.score;
+            }
+          }
+
+          if (step.complete) {
+            module.completedSteps++;
+          }
+
+          if (step.score !== null) {
+            module.score += step.score;
+          }
+        });
+      });
+
+      return self.db.updateProgress({ 'modules': modules });
+    })
+    .then(function () {
+      // try to sync trace with server
+      return self.syncer.syncTrace(trace);
+    });
 };
 
 Monitor.prototype._buildEmptyModuleStats = function () {
-  var stats = [];
+  var moduleStats = [];
 
-  this.modules.forEach(function (module) {
-    stats.push({
+  // should be shared with server side...
+  modules.forEach(function (module) {
+    var moduleScore = null, moduleMax = null;
+    var steps = module.steps.map(function (step) {
+      var score = null, max = null;
+
+      if (step.type === 'quiz-choice') {
+        moduleScore = moduleScore === null ? 0 : moduleScore;
+        moduleMax = moduleMax === null ? 0 : moduleMax;
+        score = 0;
+        max = 0;
+
+        if (step.data.challenge.type === 'multiple') {
+          step.data.solutions.forEach(function (solution) {
+            max += solution.score;
+            moduleMax += solution.score;
+          });
+        } else if (step.data.challenge.type === 'single') {
+          max = step.data.solutions.reduce(function (prev, curr) {
+            return curr.score > prev ? curr.score : prev;
+          }, 0);
+          moduleMax += max;
+        }
+      }
+
+      return {
+        id: step.id,
+        complete: false,
+        score: score,
+        max: max
+      };
+    });
+
+    moduleStats.push({
       id: module.id,
       title: module.title,
       stepCount: module.steps.length,
       completedSteps: 0,
-      steps: module.steps.map(function (step) {
-        return {
-          id: step.id,
-          complete: false,
-          score: null
-        };
-      })
+      score: moduleScore,
+      max: moduleMax,
+      steps: steps
     });
-  }, this);
+  });
 
-  return stats;
+  return moduleStats;
 };
 
 Monitor.prototype._findCloseStep = function (moduleId, stepId, isBefore) {

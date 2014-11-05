@@ -44,9 +44,9 @@ module.exports = {
           ]
         },
         solutions: [
-          { uid: 1, score: 3 },
-          { uid: 2, score: 0 },
-          { uid: 3, score: 2 }
+          { uid: 1, score: 10 },
+          { uid: 2, score: 5 },
+          { uid: 3, score: 0 }
         ]
       }
     },
@@ -67,10 +67,10 @@ module.exports = {
           ]
         },
         solutions: [
-          { uid: 1, score: 2 },
-          { uid: 2, score: 0 },
+          { uid: 1, score: 0 },
+          { uid: 2, score: 5 },
           { uid: 3, score: 0 },
-          { uid: 4, score: 0 }
+          { uid: 4, score: 2 }
         ]
       }
     }

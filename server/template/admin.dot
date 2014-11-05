@@ -14,6 +14,7 @@
         <tr>
           <th>Module</th>
           <th>Complete</th>
+          <th>Score</th>
         </tr>
       </thead>
       <tbody>
@@ -21,6 +22,7 @@
           <tr>
             <td>{{= module.id }}</td>
             <td>{{? module.completedSteps !== module.stepCount }}no{{??}}yes{{?}}</td>
+            <td>{{? module.score !== null }}{{= module.score }}/{{= module.max }}{{??}}-{{?}}</td>
           </tr>
         {{~}}
       </tbody>
@@ -42,7 +44,7 @@
             <td>{{= module.id }}</td>
             <td>{{= step.id }}</td>
             <td>{{? step.complete === false }}no{{??}}yes{{?}}</td>
-            <td>{{? step.score !== null }}{{= step.score }}{{??}}-{{?}}</td>
+            <td>{{? step.score !== null }}{{= step.score }}/{{= step.max }}{{??}}-{{?}}</td>
           </tr>
         {{~}}
       {{~}}

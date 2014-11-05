@@ -50,6 +50,10 @@ App.prototype.displayStep = function (moduleId, stepId) {
   this._switchTo(view);
 };
 
+App.prototype.refreshModuleList = function (modules) {
+  this.modules.setList(modules);
+};
+
 App.prototype._switchTo = function (element) {
   if (this.currentElement !== element) {
     this.container.removeChild(this.currentElement);
