@@ -6,14 +6,16 @@
   <title>Admin</title>
   <meta name="description" content="Plateforme d'amélioration de la maîtrise de la langue française">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-  <h3>Stats</h3>
-  <table>
+  <section>
+    <h1>Progression</h1>
+    <table>
       <thead>
         <tr>
           <th>Module</th>
-          <th>Complete</th>
+          <th>Complet</th>
           <th>Score</th>
         </tr>
       </thead>
@@ -21,59 +23,65 @@
         {{~ it.stats.modules :module }}
           <tr>
             <td>{{= module.id }}</td>
-            <td>{{? module.completedSteps !== module.stepCount }}no{{??}}yes{{?}}</td>
+            <td>{{? module.completedSteps !== module.stepCount }}non{{??}}oui{{?}}</td>
             <td>{{? module.score !== null }}{{= module.score }}/{{= module.max }}{{??}}-{{?}}</td>
           </tr>
         {{~}}
       </tbody>
     </table>
-  <h3>Stats (detail)</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Module</th>
-        <th>Step</th>
-        <th>Complete</th>
-        <th>Score</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{~ it.stats.modules :module }}
-        {{~ module.steps :step }}
-          <tr>
-            <td>{{= module.id }}</td>
-            <td>{{= step.id }}</td>
-            <td>{{? step.complete === false }}no{{??}}yes{{?}}</td>
-            <td>{{? step.score !== null }}{{= step.score }}/{{= step.max }}{{??}}-{{?}}</td>
-          </tr>
+  </section>
+  <section>
+    <h1>Progression (détails)</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Étape</th>
+          <th>Complète</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{~ it.stats.modules :module }}
+          {{~ module.steps :step }}
+            <tr>
+              <td>{{= module.id }}</td>
+              <td>{{= step.id }}</td>
+              <td>{{? step.complete === false }}non{{??}}oui{{?}}</td>
+              <td>{{? step.score !== null }}{{= step.score }}/{{= step.max }}{{??}}-{{?}}</td>
+            </tr>
+          {{~}}
         {{~}}
-      {{~}}
-    </tbody>
-  </table>
-  <h3>Traces</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Module</th>
-        <th>Step</th>
-        <th>Type</th>
-        <th>Complete</th>
-        <th>Score</th>
-        <th>Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{~ it.traces :value:index }}
-      <tr>
-        <td>{{= value.module }}</td>
-        <td>{{= value.step }}</td>
-        <td>{{= value.type }}</td>
-        <td>{{? value.complete === false }}no{{??}}yes{{?}}</td>
-        <td>{{? value.score !== null }}{{= value.score }}{{??}}-{{?}}</td>
-        <td>{{= value.time }}</td>
-      </tr>
-      {{~}}
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </section>
+  {{~ it.traces :value:index }}
+  <section>
+    <h1>Traces</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Étape</th>
+          <th>Type</th>
+          <th>Complète</th>
+          <th>Score</th>
+          <th>Temps</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{~ it.traces :value:index }}
+        <tr>
+          <td>{{= value.module }}</td>
+          <td>{{= value.step }}</td>
+          <td>{{= value.type }}</td>
+          <td>{{? value.complete === false }}non{{??}}oui{{?}}</td>
+          <td>{{? value.score !== null }}{{= value.score }}{{??}}-{{?}}</td>
+          <td>{{= value.time }}</td>
+        </tr>
+        {{~}}
+      </tbody>
+    </table>
+  </section>
 </body>
 </html>
