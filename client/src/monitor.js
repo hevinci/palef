@@ -103,7 +103,7 @@ Monitor.prototype._buildEmptyModuleStats = function () {
   var moduleStats = [];
 
   // should be shared with server side...
-  modules.forEach(function (module) {
+  this.modules.forEach(function (module) {
     var moduleScore = null, moduleMax = null;
     var steps = module.steps.map(function (step) {
       var score = null, max = null;

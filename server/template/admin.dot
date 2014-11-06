@@ -55,7 +55,6 @@
       </tbody>
     </table>
   </section>
-  {{~ it.traces :value:index }}
   <section>
     <h1>Traces</h1>
     <table>
