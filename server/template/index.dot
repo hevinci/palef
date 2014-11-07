@@ -2,6 +2,8 @@
 <html lang="fr" manifest="manifest.appcache">
 <head>
   <meta charset="utf-8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Palef</title>
   <meta name="description" content="Plateforme d'amélioration de la maîtrise de la langue française">
