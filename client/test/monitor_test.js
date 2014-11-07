@@ -28,7 +28,7 @@ describe('monitor', function () {
   });
 
   describe('#getModuleList', function () {
-    it('returns a list available modules', function (done) {
+    it('returns the list of available modules', function (done) {
       db.getProgress.returns(Promise.resolve({ modules: [1, 2, 3, 4] }));
       monitor.getModuleList()
         .then(function (modules) {

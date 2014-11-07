@@ -11,7 +11,7 @@ describe('database', function () {
   });
 
   describe('#open', function () {
-    it('creates the database if needed', function (done) {
+    it('opens the database and creates it if needed', function (done) {
       db.open('palef-test')
         .then(function (_db) {
           assert.ok(_db instanceof IDBDatabase);
