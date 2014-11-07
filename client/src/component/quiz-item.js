@@ -4,13 +4,13 @@ module.exports = function quizItem(options) {
   var item = document.createElement('li');
 
   item.uid = options.uid;
-  item.type = options.type;
+  item.quizType = options.type || 'multiple';
   item.selectedCallback = null;
 
   item.innerHTML = helpers.getTemplate('quiz-item');
   item.input = item.querySelector('input');
   item.input.id = options.quizUid + '-' + options.uid;
-  item.input.type = options.type === 'single' ? 'radio' : 'checkbox';
+  item.input.type = item.quizType === 'single' ? 'radio' : 'checkbox';
   item.input.name = 'quiz-' + options.quizUid;
   item.input.onclick = _onSelected.bind(item);
   item.querySelector('label').htmlFor = item.input.id;
