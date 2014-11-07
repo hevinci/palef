@@ -30,7 +30,7 @@ describe('component/quiz-choice', function () {
 
   it('creates a quiz from a challenge object', function () {
     var items;
-    helpers.assertElement(quiz, true);
+    assert.equal(quiz.tagName.toLowerCase(), 'main');
     items = quiz.querySelectorAll('li');
     assert.equal(items.length, 3);
     assert.equal(items[0].querySelector('input').type, 'checkbox');

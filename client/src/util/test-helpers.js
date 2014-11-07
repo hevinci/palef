@@ -7,14 +7,6 @@ var testContainer = document.querySelector('#test-container');
 var defaultElement = testContainer;
 var waitTime = 10;
 
-helpers.setWaitTime = function (time) {
-  waitTime = time;
-};
-
-helpers.setDefaultElement = function (element) {
-  defaultElement = element;
-};
-
 helpers.appendElement = function (element) {
   testContainer.appendChild(element);
 };
@@ -57,16 +49,6 @@ helpers.createEvent = function (name) {
   event.initEvent(name, true, true);
 
   return event;
-};
-
-helpers.assertElement = function (element, shouldBeFilled) {
-  assert.ok(element instanceof HTMLElement);
-
-  if (shouldBeFilled) {
-    assert.ok(element.innerHTML !== '');
-  } else {
-    assert.ok(element.innerHTML === '');
-  }
 };
 
 helpers.makeWaitPromise = function (delay, resolvedValue) {

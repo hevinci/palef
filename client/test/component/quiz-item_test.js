@@ -15,7 +15,7 @@ describe('component/quiz-item', function () {
   afterEach(helpers.clean);
 
   it('creates a quiz item from the passed options', function () {
-    helpers.assertElement(item, true);
+    assert.equal(item.tagName.toLowerCase(), 'li');
     assert.equal(item.querySelector('span').innerHTML, 'Foo');
   });
 
