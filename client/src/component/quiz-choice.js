@@ -81,7 +81,7 @@ function _onItemSelected(itemUid, isSelected) {
 }
 
 function _onValidate() {
-  if (this.validatedCallback) {
+  if (this.validatedCallback && !this.button.classList.contains('disabled')) {
     this.validatedCallback();
   }
 }

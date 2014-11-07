@@ -34,15 +34,6 @@ Monitor.prototype.getModuleList = function () {
   return Promise.resolve(self.cachedStats);
 };
 
-Monitor.prototype.getModuleInfo = function (moduleId) {
-  var module = this._findModule(moduleId);
-
-  return {
-    title: module.title,
-    stepCount: module.steps.length
-  }
-};
-
 Monitor.prototype.getStep = function (moduleId, stepId) {
   var module = this._findModule(moduleId);
   var stepIndex = this._getStepIndex(module, stepId);

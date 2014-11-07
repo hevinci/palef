@@ -7,7 +7,7 @@ module.exports = function quizItem(options) {
   item.type = options.type;
   item.selectedCallback = null;
 
-  item.innerHTML = helpers.getTemplate('quiz-item-text');
+  item.innerHTML = helpers.getTemplate('quiz-item');
   item.input = item.querySelector('input');
   item.input.id = options.quizUid + '-' + options.uid;
   item.input.type = options.type === 'single' ? 'radio' : 'checkbox';
