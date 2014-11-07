@@ -1,5 +1,4 @@
 require('es6-promise').polyfill();
-require('document-register-element');
 
 var assert = require('assert');
 var helpers = module.exports = {};
