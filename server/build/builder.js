@@ -1,5 +1,6 @@
 var fs = require('fs');
 var uglify = require('uglify-js/tools/node');
+var cleanCss = require('clean-css');
 var dotBuilder = require('./dot');
 var stylusBuilder = require('./stylus');
 var componentBuilder = require('./component');
@@ -18,8 +19,8 @@ dotBuilder.compile(function (templates) {
           version: new Date().toString()
         }));
         fs.writeFileSync(indexPath, templates.index({
-          stylesheet: stylesheet,
           layouts: layouts,
+          stylesheet: isProd ? new cleanCss().minify(stylesheet) : stylesheet,
           scripts: isProd ? uglify.minify(scripts, { fromString: true }).code : scripts
         }));
       });
