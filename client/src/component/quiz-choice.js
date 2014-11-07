@@ -1,66 +1,65 @@
-require('./quiz-item-text');
+var helpers = require('./../util/ui-helpers');
+var quizItem = require('./quiz-item');
 
-var basePrototype = require('./base-prototype');
-var quizPrototype = Object.create(basePrototype);
+function quizChoice(challenge) {
+  var quiz = document.createElement('main');
 
-quizPrototype.createdCallback = function () {
-  this.buildFromTemplate('quiz-choice');
-  this.uid = null;
-  this.type = 'single';
-  this.chosenItemUids = [];
-  this.titleBox = this.querySelector('h3');
-  this.itemContainer = this.querySelector('ul');
-  this.button = this.querySelector('button');
-  this.button.onclick = this._onValidate.bind(this);
-  this.isBound = false;
-};
+  quiz.isBound = false;
+  quiz.chosenItemUids = [];
+  quiz.validatedCallback = null;
 
-quizPrototype.validatedCallback = null;
+  quiz.innerHTML = helpers.getTemplate('quiz-choice');
+  quiz.itemContainer = quiz.querySelector('ul');
+  quiz.button = quiz.querySelector('.icon-tick');
+  quiz.button.onclick = _onValidate.bind(quiz);
 
-quizPrototype.setChallenge = function (challenge) {
+  quiz.setChallenge = setChallenge.bind(quiz);
+  quiz.computeScore = computeScore.bind(quiz);
+
+  quiz.setChallenge(challenge);
+
+  return quiz;
+}
+
+function setChallenge(challenge) {
   this.uid = challenge.uid;
   this.type = challenge.type;
-  this._bind(challenge.title, challenge.items);
-};
 
-quizPrototype.computeScore = function (answers) {
-  var score = 0;
-
-  answers.filter(function (answer) {
-    return this.chosenItemUids.indexOf(answer.uid) !== -1;
-  }, this).forEach(function (answer) {
-      score += answer.score;
-  });
-
-  return score;
-};
-
-quizPrototype._bind = function (title, items) {
   if (this.isBound) {
     while (this.itemContainer.firstChild) {
       this.itemContainer.removeChild(this.itemContainer.firstChild);
     }
   }
 
-  this.titleBox.innerHTML = title;
   var fragment = document.createDocumentFragment();
-  items.forEach(function (data) {
-    var item = document.createElement('quiz-item-text');
-    item.setData({
-      uid: data.uid,
-      quizUid: this.uid,
-      type: this.type,
-      text: data.text
+  challenge.items.forEach(function (item) {
+    var item = quizItem({
+      uid: item.uid,
+      quizUid: challenge.uid,
+      type: challenge.type,
+      text: item.text
     });
-    item.selectedCallback = this._onItemSelected.bind(this);
+    item.selectedCallback = _onItemSelected.bind(this);
     fragment.appendChild(item);
   }, this);
 
   this.itemContainer.appendChild(fragment);
   this.isBound = true;
-};
+}
 
-quizPrototype._onItemSelected = function (itemUid, isSelected) {
+function computeScore(answers) {
+  var score = 0;
+
+  answers.filter(function (answer) {
+    return this.chosenItemUids.indexOf(answer.uid) !== -1;
+  }, this).forEach(function (answer) {
+    score += answer.score;
+  });
+
+  return score;
+}
+
+function _onItemSelected(itemUid, isSelected) {
   var itemIndex = this.chosenItemUids.indexOf(itemUid);
   var hasAlreadyItems = this.chosenItemUids.length > 0;
 
@@ -75,16 +74,16 @@ quizPrototype._onItemSelected = function (itemUid, isSelected) {
   }
 
   if (this.chosenItemUids.length === 0) {
-    this.button.disabled = true;
+    this.button.classList.add('disabled');
   } else if (!hasAlreadyItems) {
-    this.button.disabled = false;
+    this.button.classList.remove('disabled');
   }
-};
+}
 
-quizPrototype._onValidate = function () {
-  if (typeof this.validatedCallback) {
+function _onValidate() {
+  if (this.validatedCallback && !this.button.classList.contains('disabled')) {
     this.validatedCallback();
   }
-};
+}
 
-document.registerElement('quiz-choice', { prototype: quizPrototype });
+module.exports = quizChoice;

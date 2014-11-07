@@ -3,5 +3,5 @@ CACHE MANIFEST
 # {{= it.version }}
 
 font/sourcesanspro-light.woff
-font/icomoon.woff
-video/sample.mp4
+image/chart.svg
+video/sample.ogv

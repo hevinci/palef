@@ -76,21 +76,55 @@ function loadModuleStats() {
       require('./../fixtures/module/module1'),
       require('./../fixtures/module/module2'),
       require('./../fixtures/module/module3'),
-      require('./../fixtures/module/module4')
+      require('./../fixtures/module/module4'),
+      require('./../fixtures/module/module5'),
+      require('./../fixtures/module/module6'),
+      require('./../fixtures/module/module7'),
+      require('./../fixtures/module/module8'),
+      require('./../fixtures/module/module9'),
+      require('./../fixtures/module/module10'),
+      require('./../fixtures/module/module11')
     ];
     modules.forEach(function (module) {
+      var moduleScore = null, moduleMax = null;
+      var steps = module.steps.map(function (step) {
+        var score = null, max = null;
+
+        if (step.type === 'quiz-choice') {
+          moduleScore = moduleScore === null ? 0 : moduleScore;
+          moduleMax = moduleMax === null ? 0 : moduleMax;
+          score = 0;
+          max = 0;
+
+          if (step.data.challenge.type === 'multiple') {
+            step.data.solutions.forEach(function (solution) {
+              max += solution.score;
+              moduleMax += solution.score;
+            });
+          } else if (step.data.challenge.type === 'single') {
+            max = step.data.solutions.reduce(function (prev, curr) {
+              return curr.score > prev ? curr.score : prev;
+            }, 0);
+            moduleMax += max;
+          }
+        }
+
+        return {
+          id: step.id,
+          complete: false,
+          score: score,
+          max: max
+        };
+      });
+
       moduleStats.push({
         id: module.id,
         title: module.title,
         stepCount: module.steps.length,
         completedSteps: 0,
-        steps: module.steps.map(function (step) {
-          return {
-            id: step.id,
-            complete: false,
-            score: null
-          };
-        })
+        score: moduleScore,
+        max: moduleMax,
+        steps: steps
       });
     });
     var collection = db.collection('statistics');

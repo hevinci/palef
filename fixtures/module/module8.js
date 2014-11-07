@@ -1,6 +1,6 @@
 module.exports = {
-  id: 1,
-  title: 'Module 1',
+  id: 8,
+  title: 'Module 8',
   steps: [
     {
       id: 1,
@@ -38,9 +38,9 @@ module.exports = {
           ]
         },
         solutions: [
-          { uid: 1, score: 8 },
-          { uid: 2, score: 0 },
-          { uid: 3, score: 3 },
+          { uid: 1, score: 0 },
+          { uid: 2, score: 5 },
+          { uid: 3, score: 7 },
           { uid: 4, score: 4 }
         ]
       }
@@ -61,7 +61,7 @@ module.exports = {
           ]
         },
         solutions: [
-          { uid: 1, score: 5 },
+          { uid: 1, score: 4 },
           { uid: 2, score: 0 },
           { uid: 3, score: 0 }
         ]

@@ -1,0 +1,43 @@
+@font-face {
+  font-family: "Source sans pro";
+  src: url("../font/sourcesanspro-light.woff");
+}
+
+body {
+  display: flex;
+  flex-flow: row wrap;
+  font-family: "Source sans pro";
+  font-size: 100%;
+  color: rgba(0,0,0,.87);
+  background-color: #ede7f6;
+}
+
+section {
+  margin: 20px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  color: rgba(0,0,0,0.54);
+}
+
+table {
+  padding: 12px;
+  border-collapse: collapse;
+  background-color: #fff;
+  text-align: center;
+}
+
+th {
+  color: rgba(0,0,0,.64);
+  background-color: #d1c4e9;
+}
+
+td {
+  min-width: 74px;
+}
+
+th, td {
+  padding: 4px;
+  border: solid 1px #d1c4e9;
+}

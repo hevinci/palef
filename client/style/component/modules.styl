@@ -1,0 +1,58 @@
+main.modules
+  display flex
+  flex-flow row wrap
+  box-sizing border-box
+  width 100%
+  padding 2.5% 1.5%
+
+a.module-card
+  display block
+  box-sizing border-box
+  width 97%
+  margin 4px 1.5%
+  padding $gutterSmaller
+  border solid $hueLight 1px
+  border-radius 3px
+  color $whiteBgText
+  text-decoration none
+  background-color $white
+  transition background-color 0.3s
+  h2
+    margin 0 auto 6px
+    font-size $textNormal
+    font-weight normal
+  progress[value]
+    display inline-block
+    width 70%
+    vertical-align middle
+  span.module-score
+    display inline-block
+    width 20%
+    margin-left 8%
+    text-align right
+    color $whiteBgSecondaryText
+
+div.module-card:hover
+  border-color $white
+  background-color $hueLight
+  progress[value]
+    border-color $white
+    color $accentLight
+  progress[value]::-webkit-progress-value
+    background-color $accentLight
+  progress[value]::-moz-progress-bar
+    background-color $accentLight
+
+@media all and (min-width: 600px)
+  a.module-card
+    width 47%
+    margin 10px 1.5%
+    border-radius 4px
+
+@media all and (min-width: 900px)
+  main.modules
+    max-width 1200px
+    margin auto
+  a.module-card
+    width 30.33%
+    margin 14px 1.5%

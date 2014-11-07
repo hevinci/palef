@@ -1,5 +1,5 @@
 var assert = require('assert');
-var helpers = require('./../src/test-helpers');
+var helpers = require('./../src/util/test-helpers');
 var db = require('./../src/database');
 var http = require('./../src/http');
 var Trace = require('./../src/trace');
