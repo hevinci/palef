@@ -36,7 +36,7 @@ describe('component/header', function () {
       header.setArrowState({ previous: '#/foo', next: false });
       assert.ok(!previous.classList.contains('disabled'));
       assert.ok(next.classList.contains('disabled'));
-      assert.equal(previous.href, document.documentURI + '#/foo');
+      assert.equal(previous.href, document.URL + '#/foo');
     });
   });
 });
