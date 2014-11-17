@@ -1,6 +1,6 @@
 var assert = require('assert');
-var Monitor = require('./../src/monitor');
-var Trace = require('./../src/trace');
+var Monitor = require('./../../src/player/monitor');
+var Trace = require('./../../src/player/trace');
 
 describe('monitor', function () {
   var monitor, db, syncer, modules;
@@ -15,10 +15,10 @@ describe('monitor', function () {
       syncTrace: sinon.stub()
     };
     modules = [
-      require('./../../fixtures/module/module1'),
-      require('./../../fixtures/module/module2'),
-      require('./../../fixtures/module/module3'),
-      require('./../../fixtures/module/module4')
+      require('./../../../fixtures/module/module1'),
+      require('./../../../fixtures/module/module2'),
+      require('./../../../fixtures/module/module3'),
+      require('./../../../fixtures/module/module4')
     ];
     monitor = new Monitor(syncer, db, modules);
 

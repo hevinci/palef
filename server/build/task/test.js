@@ -1,10 +1,11 @@
 var fs = require('fs');
 var glob = require('glob');
 var browserify = require('browserify')();
-var componentBuilder = require('./component');
-var moduleDir = __dirname + '/../../node_modules';
-var testDir = __dirname + '/../../client/test';
-var tgtDir = __dirname + '/../../public/test';
+var componentBuilder = require('./../component');
+var rootDir = __dirname + '/../../..';
+var moduleDir = rootDir + '/node_modules';
+var testDir = rootDir + '/client/test';
+var tgtDir = rootDir + '/public/test';
 var vendorDir = tgtDir + '/vendor';
 
 // create test/vendor directory if necessary

@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Router = require('./../src/router');
+var Router = require('./../../src/player/router');
 
 describe('router', function () {
   var router;

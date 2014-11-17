@@ -2,7 +2,7 @@
   "name": "palef",
   "dependencies": {
     "body-parser": "^1.9.1",
-    "browserify": "^5.12.1",
+    "browserify": "^5.13.1",
     "clean-css": "^2.2.16",
     "dot": "^1.0.2",
     "es6-promise": "^1.0.0",
@@ -15,8 +15,10 @@
   },
   "scripts": {
     "start": "node server/app.js",
-    "build": "node server/build/builder.js",
-    "build-test": "node server/build/test.js"
+    "build-editor": "node server/build/task/editor.js",
+    "build-player": "node server/build/task/player.js",
+    "build-test": "node server/build/task/test.js",
+    "build-all": "node server/build/task/editor.js && node server/build/task/player.js && node server/build/task/test.js"
   },
   "devDependencies": {
     "mocha": "^1.21.4",

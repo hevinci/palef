@@ -1,4 +1,4 @@
-var helpers = require('./../util/ui-helpers');
+var helpers = require('./../../util/ui-helpers');
 var quizItem = require('./quiz-item');
 
 function quizChoice(challenge) {

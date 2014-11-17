@@ -1,8 +1,10 @@
 .idea
 node_modules
 npm-debug.log
+public/css/editor.css
 public/index.html
 public/manifest.appcache
+public/script
 public/test/bundle.js
 public/test/templates.js
 public/test/vendor

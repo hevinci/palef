@@ -1,7 +1,6 @@
 var assert = require('assert');
-var helpers = require('./../../src/util/test-helpers');
-
-var modulesFunc = require('./../../src/component/modules');
+var helpers = require('./../../../src/util/test-helpers');
+var modulesFunc = require('./../../../src/player/component/modules');
 
 describe('component/modules', function () {
   var modules;

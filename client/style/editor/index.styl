@@ -1,0 +1,60 @@
+@font-face
+  font-family "Source sans pro";
+  src url("../font/sourcesanspro-light.woff")
+
+html
+  font-size 100%
+
+html, body
+  height 100%
+  margin 0
+  padding 0
+
+*
+  // force font options on select/textarea/...
+  font-size 1rem
+  font-family "Source sans pro", Helvetica, Arial, Sans-Serif
+  color rgba(0,0,0,0.87)
+
+body
+  background-color #ede7f6
+
+.hidden
+  display none
+
+form > div
+  display table
+  border-spacing 10px
+
+form > div > label
+  display table-cell
+  min-width 60px
+  padding-left 14px
+  vertical-align middle
+  border-right solid rgba(0,0,0,0.32) 3px
+
+form > div > label + *
+  display table-cell
+  margin-left 14px
+
+textarea
+  min-width 380px
+  resize none
+  overflow hidden
+
+select
+  background-color white
+
+select > option[value=prompt]
+  color #999
+
+input[type=submit]
+  margin-left 120px
+
+input[disabled]
+  display none
+
+
+input.choice {
+  display: block;
+}

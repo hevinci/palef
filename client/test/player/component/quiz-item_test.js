@@ -1,7 +1,6 @@
 var assert = require('assert');
-var helpers = require('./../../src/util/test-helpers');
-
-var quizItem = require('./../../src/component/quiz-item');
+var helpers = require('./../../../src/util/test-helpers');
+var quizItem = require('./../../../src/player/component/quiz-item');
 
 describe('component/quiz-item', function () {
   var item, baseData;

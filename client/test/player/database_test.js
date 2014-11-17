@@ -1,7 +1,7 @@
 var assert = require('assert');
-var helpers = require('./../src/util/test-helpers');
-var db = require('./../src/database');
-var Trace = require('./../src/trace');
+var helpers = require('./../../src/util/test-helpers');
+var db = require('./../../src/player/database');
+var Trace = require('./../../src/player/trace');
 
 describe('database', function () {
 

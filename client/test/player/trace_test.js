@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Trace = require('./../src/trace');
+var Trace = require('./../../src/player/trace');
 
 describe('trace', function () {
   it('holds trace data and timestamp', function () {

@@ -1,4 +1,4 @@
-var helpers = require('./../util/ui-helpers');
+var helpers = require('./../../util/ui-helpers');
 
 module.exports = function quizItem(options) {
   var item = document.createElement('li');

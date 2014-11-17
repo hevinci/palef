@@ -1,7 +1,7 @@
 var fs = require('fs');
 var glob = require('glob');
 var minify = require('html-minifier').minify;
-var componentDir = __dirname + '/../../client/src/component';
+var componentDir = __dirname + '/../../client/src/player/component';
 var templates = {};
 
 /**

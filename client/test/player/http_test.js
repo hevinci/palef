@@ -1,6 +1,6 @@
 var assert = require('assert');
-var helpers = require('./../src/util/test-helpers');
-var http = require('./../src/http');
+var helpers = require('./../../src/util/test-helpers');
+var http = require('./../../src/player/http');
 
 describe('http', function () {
 

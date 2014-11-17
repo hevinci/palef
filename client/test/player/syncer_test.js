@@ -1,9 +1,9 @@
 var assert = require('assert');
-var helpers = require('./../src/util/test-helpers');
-var db = require('./../src/database');
-var http = require('./../src/http');
-var Trace = require('./../src/trace');
-var Syncer = require('./../src/syncer');
+var helpers = require('./../../src/util/test-helpers');
+var db = require('./../../src/player/database');
+var http = require('./../../src/player/http');
+var Trace = require('./../../src/player/trace');
+var Syncer = require('./../../src/player/syncer');
 
 // "waiting time" after sync calls: increase this value on slow systems
 var delay = 20;

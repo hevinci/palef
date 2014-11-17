@@ -1,7 +1,6 @@
 var assert = require('assert');
-var helpers = require('./../../src/util/test-helpers');
-
-var headerFunc = require('./../../src/component/header');
+var helpers = require('./../../../src/util/test-helpers');
+var headerFunc = require('./../../../src/player/component/header');
 
 describe('component/header', function () {
   var header;

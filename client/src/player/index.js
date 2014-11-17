@@ -10,17 +10,17 @@ var http = require('./http');
 var router = new Router();
 var syncer = new Syncer(db, http, true);
 var monitor = new Monitor(syncer, db, [
-  require('./../../fixtures/module/module1'),
-  require('./../../fixtures/module/module2'),
-  require('./../../fixtures/module/module3'),
-  require('./../../fixtures/module/module4'),
-  require('./../../fixtures/module/module5'),
-  require('./../../fixtures/module/module6'),
-  require('./../../fixtures/module/module7'),
-  require('./../../fixtures/module/module8'),
-  require('./../../fixtures/module/module9'),
-  require('./../../fixtures/module/module10'),
-  require('./../../fixtures/module/module11')
+  require('./../../../fixtures/module/module1'),
+  require('./../../../fixtures/module/module2'),
+  require('./../../../fixtures/module/module3'),
+  require('./../../../fixtures/module/module4'),
+  require('./../../../fixtures/module/module5'),
+  require('./../../../fixtures/module/module6'),
+  require('./../../../fixtures/module/module7'),
+  require('./../../../fixtures/module/module8'),
+  require('./../../../fixtures/module/module9'),
+  require('./../../../fixtures/module/module10'),
+  require('./../../../fixtures/module/module11')
 ]);
 var app = new App(monitor);
 

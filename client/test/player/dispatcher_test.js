@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Dispatcher = require('./../src/dispatcher').Dispatcher;
+var Dispatcher = require('./../../src/player/dispatcher').Dispatcher;
 
 describe('dispatcher', function () {
   var dispatcher;

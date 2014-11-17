@@ -1,4 +1,4 @@
-var helpers = require('./../util/ui-helpers');
+var helpers = require('./../../util/ui-helpers');
 
 module.exports = function header() {
   var header = document.createElement('header');
